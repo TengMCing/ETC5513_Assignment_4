@@ -1,0 +1,50 @@
+---
+title: "Exploratory analysing on World Happiness Report"
+author:
+- familyname: Li
+  othernames: Weihao
+  address: Monash University
+  email: wlii0039@student.monash.edu
+  correspondingauthor: true
+  qualifications: 28723740
+- familyname: Curie
+  othernames: Pierre
+  address: University of Paris
+  qualifications: Nobel Prize, PhD
+department: Department of\newline Econometrics &\newline Business Statistics
+organization: ETC5513 Assignment 4
+bibliography: references.bib
+biblio-style: apa
+linestretch: 1.5
+output:
+  MonashEBSTemplates::report:
+    fig_caption: yes
+    fig_height: 5
+    fig_width: 8
+    includes:
+      in_header: preamble.tex
+    keep_tex: yes
+    number_sections: yes
+    citation_package: biblatex
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
+# Make sure you have the latest versions of rmarkdown and bookdown installed
+library(ggplot2)
+```
+
+
+# Introduction
+
+In a famous paper, @BC64 introduced a family of transformations \dots
+
+```{r histogram, fig.cap="Nice histogram", message=FALSE, warning=FALSE}
+qplot(exp(rnorm(200)))
+```
+
+Consider the logNormal data plotted in Figure \ref{fig:histogram}.
+
+$$s^2 = \sum_{i=1}^n (x_i-\bar{x})^2$$
+
