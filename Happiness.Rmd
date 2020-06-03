@@ -33,18 +33,17 @@ output:
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
+library(here)
+library(tidyverse)
+```
+
+```{r read-in, cache = TRUE}
+happiness_2015 <- read.csv(here::here("Data/2015.csv"))
+happiness_2016 <- read.csv(here::here("Data/2016.csv"))
+happiness_2017 <- read.csv(here::here("Data/2017.csv"))
+happiness_2018 <- read.csv(here::here("Data/2018.csv"))
+happiness_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
 
-# Introduction
-
-In a famous paper, @BC64 introduced a family of transformations \dots
-
-```{r histogram, fig.cap="Nice histogram", message=FALSE, warning=FALSE}
-qplot(exp(rnorm(200)))
-```
-
-Consider the logNormal data plotted in Figure \ref{fig:histogram}.
-
-$$s^2 = \sum_{i=1}^n (x_i-\bar{x})^2$$
 
