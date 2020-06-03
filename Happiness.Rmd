@@ -7,10 +7,12 @@ author:
   email: wlii0039@student.monash.edu
   correspondingauthor: true
   qualifications: 28723740
-- familyname: Curie
-  othernames: Pierre
-  address: University of Paris
-  qualifications: Nobel Prize, PhD
+- familyname: Luo
+  othernames: Jinhao
+  address: Monash University
+  email: jluo0015@student.monash.edu
+  correspondingauthor: true
+  qualifications: 29012449
 department: Department of\newline Econometrics &\newline Business Statistics
 organization: ETC5513 Assignment 4
 bibliography: references.bib
