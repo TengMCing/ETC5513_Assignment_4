@@ -46,11 +46,17 @@ library(readr)
 # Total trends
 
 ```{r read-data}
-data_2015 <- read_csv(here("data", "2015.csv"))
-data_2016 <- read_csv(here("data", "2016.csv"))
-data_2017 <- read_csv(here("data", "2017.csv"))
-data_2018 <- read_csv(here("data", "2018.csv"))
-data_2019 <- read_csv(here("data", "2019.csv"))
+happiness_2015 <- read_csv(here("data", "2015.csv"))
+happiness_2016 <- read_csv(here("data", "2016.csv"))
+happiness_2017 <- read_csv(here("data", "2017.csv"))
+happiness_2018 <- read_csv(here("data", "2018.csv"))
+happiness_2019 <- read_csv(here("data", "2019.csv"))
 ```
 
+```{r top20-countries-2015}
+top20_2015  <- happiness_2015 %>%
+  filter(`Happiness Rank` <= 20) %>%
+  select(Country, `Happiness Score`) %>%
+  rename("2016" = "Happiness Score")
+```
 
