@@ -30,21 +30,93 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = FALSE, cache=FALSE, messages=FALSE, warning=FALSE)
 # Make sure you have the latest versions of rmarkdown and bookdown installed
-library(ggplot2)
+library(tidyverse)
+
 ```
 
 
-# Introduction
+# Q4. What is the relationship between predictors and happiness score?
 
-In a famous paper, @BC64 introduced a family of transformations \dots
-
-```{r histogram, fig.cap="Nice histogram", message=FALSE, warning=FALSE}
-qplot(exp(rnorm(200)))
+```{r message=FALSE}
+h15 = read_csv("Data/2015.csv")
+h16 = read_csv("Data/2016.csv")
+h17 = read_csv("Data/2017.csv")
+h18 = read_csv("Data/2018.csv")
+h18$`Perceptions of corruption` = as.numeric(h18$`Perceptions of corruption`)
+h19 = read_csv("Data/2019.csv")
 ```
 
-Consider the logNormal data plotted in Figure \ref{fig:histogram}.
+```{r}
+mod15 = lm(as.formula(paste('`', 
+                            colnames(h15)[4], "`~`",
+                            paste(colnames(h15)[c(6, 7, 8, 9, 10, 11, 12)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = h15)
+```
 
-$$s^2 = \sum_{i=1}^n (x_i-\bar{x})^2$$
+```{r mod2015}
+c_table = summary(mod15)
+
+rownames(c_table$coefficients) = c_table$coefficients %>%
+  rownames() %>%
+  stringr::str_remove_all('`')
+
+c_table$coefficients %>%
+  knitr::kable('latex', 
+               digits = 4, 
+               booktabs = TRUE,
+               caption = "Linear regression model for happiness scores in 2015. The $R^2$ of this model is 1. In the dataset, these factors are standardized.") %>%
+  kableExtra::kable_styling(latex_options = "striped")
+```
+
+
+To explore the relationship between hapiness score and factors including economy, family, health, freedom, trust and generosity, a linear regression model for the 2015 data was developed. Results of this model is shown in Table \ref{tab:mod2015}. From the result, we can conclude the estimated closed form of hapiness score:
+
+\begin{align*}
+\text{Hapiness score} = & \text{ GDP per Capita } + \text{ Family } + \text{ Life expectancy }+ \text{ Freedom } +   \\ 
+&  \text{ Government Corruption } + \text{ Generosity } + \text{Dystopia Residual }
+\end{align*}
+
+There is a stong evidence that the hapiness score is and only is a simple average of these factors. Therefore, the relationship between hapiness score and these factors is no longer interesting to us.
+
+This situation also happens in 2016 and 2017 data. Besides, for 2018 and 2019 data, the orginization provide another set of variables which is also highly correlated with the hapiness score, but we have no mean to understand what those value represent, since they have been transformed in an unknown way.
+
+Instead of using the factors in the given dataset, we join another dataset, 
+
+
+```{r eval = FALSE}
+mod18 = lm(as.formula(paste('`', 
+                            colnames(h18)[3], "`~`",
+                            paste(colnames(h18)[c(4, 5, 6, 7, 8, 9)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = h18)
+```
+
+```{r eval = FALSE}
+summary(mod18)
+```
+
+```{r eval = FALSE}
+mod19 = lm(as.formula(paste('`', 
+                            colnames(h19)[3], "`~`",
+                            paste(colnames(h19)[c(4, 5, 6, 7, 8, 9)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = h19)
+```
+
+```{r eval = FALSE}
+summary(mod19)
+```
+
+```{r}
+library(rnaturalearth)
+library(sf)
+world_map = ne_countries(returnclass = 'sf')
+is.na(sapply(h15$Country, match, table = world_map$name)) %>% sum()
+```
 
