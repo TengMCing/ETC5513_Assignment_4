@@ -35,18 +35,22 @@ output:
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
+library(here)
+library(tidyverse)
+library(readr)
 ```
 
 
 # Introduction
 
-In a famous paper, @BC64 introduced a family of transformations \dots
+# Total trends
 
-```{r histogram, fig.cap="Nice histogram", message=FALSE, warning=FALSE}
-qplot(exp(rnorm(200)))
+```{r read-data}
+data_2015 <- read_csv(here("data", "2015.csv"))
+data_2016 <- read_csv(here("data", "2016.csv"))
+data_2017 <- read_csv(here("data", "2017.csv"))
+data_2018 <- read_csv(here("data", "2018.csv"))
+data_2019 <- read_csv(here("data", "2019.csv"))
 ```
 
-Consider the logNormal data plotted in Figure \ref{fig:histogram}.
-
-$$s^2 = \sum_{i=1}^n (x_i-\bar{x})^2$$
 
