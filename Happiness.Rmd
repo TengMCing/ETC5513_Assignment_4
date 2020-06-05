@@ -48,6 +48,8 @@ h18$`Perceptions of corruption` = as.numeric(h18$`Perceptions of corruption`)
 h19 = read_csv("Data/2019.csv")
 ```
 
+<!--
+
 ```{r}
 mod15 = lm(as.formula(paste('`', 
                             colnames(h15)[4], "`~`",
@@ -86,6 +88,7 @@ This situation also happens in 2016 and 2017 data. Besides, for 2018 and 2019 da
 
 Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by country. GDP, CPI and population data is downloaded from The World Bank. And area of each country is computed using the simple feature polygons provided in package `rnaturalearth`.
 
+-->
 
 ```{r message=FALSE, warning=FALSE}
 library(rnaturalearth)
@@ -155,13 +158,59 @@ as_tibble(world_map) %>%
 
 ```
 
-```{r}
-head(hs)
+```{r }
+nona_hs = na.omit(hs)
+
+nona_hs = nona_hs %>%
+  mutate(log_score = log(`Happiness Score`), log_cpi = log(cpi), log_gdp = log(gdp), log_area = log(area), log_population = log(population)) %>%
+  select(log_score:log_population)
+
+lm(log_score~log_cpi+log_gdp+log_population+log_area,data=nona_hs) %>%
+  summary() -> lm_sum
+
 ```
 
-```{r}
-lm(log(`Happiness Score`)~log(area)+log(cpi)+log(gdp),data=hs) %>%
-  summary()
+
+```{r lmcoeff}
+
+rownames(lm_sum$coefficients) = lm_sum$coefficients %>%
+  rownames() %>%
+  stringr::str_remove_all('`')
+
+lm_sum$coefficients %>%
+  knitr::kable('latex', 
+               digits = 4, 
+               booktabs = TRUE,
+               caption = "Linear regression model for happiness scores. The $R^2$ of this model is 0.7288.") %>%
+  kableExtra::kable_styling(latex_options = "striped")
 ```
+
+We use variables which mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
+
+\begin{align*}
+\text{log(Happiness Score)} = & \ 0.3208 + 0.0025\text{ log(CPI)} + 0.1279 \text{ log(GDP)} \\
+&- 0.1223 \text{ log(Population)} + 0.0057 \text{ log(Area)}
+\end{align*}
+
+Notice that only the intercpet, log of GDP and the log of population are significant with $\alpha = 5$%. Since we take log on both response variable and regressors, we can interpret them as the elasticity of happiness score of GDP and the elasticity of happiness score of population. This can be proved by:
+
+\begin{align}
+\frac{\partial \text{log(Happiness Score)}}{\partial \text{log(GDP)}} &= 0.1279\\
+\intertext{From (1) we can say, when other variables remain constant }\nonumber \\
+\Delta \text{ log(Happiness Score)} &= 0.1279 \Delta \text{ log(GDP)}\\
+\intertext{By using the linear approximation of log function, we can know}\nonumber\\
+log(x_0 + \Delta x) - log(x_0) &\approx log(x_0) + log'(x_0)\Delta x - log(x_0)\\
+&=  \frac{\Delta x}{x_0} = \text{percentage change in x}\nonumber\\
+\intertext{Therefore}\nonumber\\
+\frac{\Delta \text{ log(Happiness Score)}}{\Delta \text{ log(GDP)}} &\approx \frac{\Delta \text{ Happiness Score}}{\Delta \text{ GDP} }\frac{\text{GDP}}{\text{Happiness Score}}\\
+&=\frac{\% \Delta \text{ Happiness Score}}{\% \Delta \text{ GDP}} \nonumber\\
+&= 0.1279\nonumber
+\end{align}
+
+Now we can interpret the result from Table \ref{tab:lmcoeff}. We will only report variables that are statistically significant. Roughly, a 1% increase in GDP leads to a 0.1279% rise in the happiness score, and a 1% increase in population leads to a 0.1223% fall in the happiness score.
+
+
+Apparently, the happiness score can be affected by others factors that correlated with regressors and doesn't include in our model, such as education index and social welfare system. It means endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include more variables that we think will be useful for hapiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression.
+
 
 
