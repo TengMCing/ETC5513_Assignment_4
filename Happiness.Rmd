@@ -39,6 +39,7 @@ library(here)
 library(tidyverse)
 library(readr)
 library(kableExtra)
+library(lubridate)
 ```
 
 
@@ -58,10 +59,11 @@ happiness_2019 <- read_csv(here("data", "2019.csv"))
 top10_2015  <- happiness_2015 %>%
   filter(`Happiness Rank` <= 10) %>%
   select(Country, `Happiness Score`) %>%
-  rename("2015" = "Happiness Score")
+  rename("2015-01-01" = "Happiness Score")
 
 top10_2015 %>% 
-  arrange(desc(`2015`)) %>% 
+  arrange(desc(`2015-01-01`)) %>% 
+  rename("2015" = "2015-01-01") %>% 
   kable(caption = "Top10 countries in 2015") %>%
   kable_styling(bootstrap_options = c("bordered", "striped"))
 ```
@@ -69,28 +71,44 @@ top10_2015 %>%
 ```{r wrangling-2016-data}
 data_2016 <- happiness_2016 %>% 
   select(Country, `Happiness Score`) %>% 
-  rename("2016" = "Happiness Score")
+  rename("2016-01-01" = "Happiness Score")
 ```
 
 ```{r wrangling-2017-data}
 data_2017 <- happiness_2017 %>% 
   select(Country, Happiness.Score) %>% 
-  rename("2017" = "Happiness.Score")
+  rename("2017-01-01" = "Happiness.Score")
 ```
 
 ```{r wrangling-2018-data}
 data_2018 <- happiness_2018 %>% 
   select(`Country or region`, Score) %>% 
-  rename("2018" = "Score")
+  rename("2018-01-01" = "Score",
+         "Country" = "Country or region")
 ```
 
 ```{r wrangling-2019-data}
 data_2019 <- happiness_2019 %>% 
-  select(Country, `Happiness Score`) %>% 
-  rename("2019" = "Happiness Score")
+  select(`Country or region`, Score) %>% 
+  rename("2019-01-01" = "Score",
+         "Country" = "Country or region")
 ```
 
+```{r join-data-frame}
+total_data <- list(top10_2015, data_2016, data_2017, data_2018, data_2019) %>%
+  reduce(left_join, by = "Country")
+```
 
+```{r score_trends}
+total_data_plot <- total_data %>%
+  pivot_longer(c(`2015-01-01`,`2016-01-01`,`2017-01-01`,`2018-01-01`,`2019-01-01`), names_to = "year", values_to = "score") %>% 
+  mutate(year = year(year))
+
+total_data_plot %>% 
+  ggplot(aes(year, score, colour = Country)) + 
+  geom_line() + 
+  geom_point(aes(shape = Country))
+```
 
 
 
