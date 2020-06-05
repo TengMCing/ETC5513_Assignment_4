@@ -98,3 +98,17 @@ names(data2019)[7]<-"Perceptions of Corruption"
   **To explore the factors that could be contributing to the happiness score differences between each years, differenct variables in each year will be displayed.**
   
   Firstly,after wrangling the data and comparing the variables, two different variable sets are established.
+  
+```{r variable2015-2017}
+colnames(data2015)%>%kable(caption = 'variable in 2015 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+colnames(data2016)%>%kable(caption = 'variable in 2016 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+
+colnames(data2017)%>%kable(caption = 'variable in 2017 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+```{r variable2018-2019}
+colnames(data2018)%>%kable(caption = 'variable in 2018 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+colnames(data2019)%>%kable(caption = 'variable in 2019 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+**Table \@ref(tab:variable2015-2017)** shows the same variables for evaluating the happiness scores between 2015 and 2017. **Table \@ref(tab:variable2018-2019)** shows the same variables for evaluating the happiness scores between 2018 and 2019.  The biggest difference in two variable sets is the variable with family factor between 2015 and 2017 which changed to social support factor from 2018 to 2019.
