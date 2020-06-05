@@ -29,15 +29,11 @@ output:
     toc: false
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, 
-                      warning = FALSE, 
-                      message = FALSE)
-knitr::opts_chunk$set(fig.width = 8, fig.height = 5, fig.alig = "center")
-```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 5, fig.alig = "center")
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
 library(tidyverse)
@@ -97,18 +93,76 @@ names(data2019)[7]<-"Perceptions of Corruption"
 
   **To explore the factors that could be contributing to the happiness score differences between each years, differenct variables in each year will be displayed.**
   
-  Firstly,after wrangling the data and comparing the variables, two different variable sets are established.
+  Firstly, after wrangling the data and comparing the variables, two different variable sets are established.
+  **Table \@ref(tab:variable2015)** ,**Table \@ref(tab:variable2016)** and **Table \@ref(tab:variable2017)**   shows the same variables for evaluating the happiness scores between 2015 and 2017. 
   
-```{r variable2015-2017}
+```{r variable2015}
 colnames(data2015)%>%kable(caption = 'variable in 2015 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+```{r variable2016}
 colnames(data2016)%>%kable(caption = 'variable in 2016 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
 
+```{r variable2017}
 colnames(data2017)%>%kable(caption = 'variable in 2017 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
 ```
 
-```{r variable2018-2019}
+```{r variable2018}
 colnames(data2018)%>%kable(caption = 'variable in 2018 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+```{r variable2019}
 colnames(data2019)%>%kable(caption = 'variable in 2019 dataset') %>%kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
 ```
 
-**Table \@ref(tab:variable2015-2017)** shows the same variables for evaluating the happiness scores between 2015 and 2017. **Table \@ref(tab:variable2018-2019)** shows the same variables for evaluating the happiness scores between 2018 and 2019.  The biggest difference in two variable sets is the variable with family factor between 2015 and 2017 which changed to social support factor from 2018 to 2019.
+**Table \@ref(tab:variable2018)** and  **Table \@ref(tab:variable2019)** shows the same variables for evaluating the happiness scores between 2018 and 2019.  The biggest difference in two variable sets is the variable with family factor between 2015 and 2017 which changed to social support factor from 2018 to 2019. 
+
+\clearpage
+
+## Variable importance
+
+  After comparing the different variables between 2015 and 2019, the **lmg** approach is used for evaluating the variable importance in modelling happiness score. By using **lmg** approach to  calculate the relative contribution of each predictor to the $$R^2$$ with the consideration of the sequence of predictors appearing in the model. Based on the variable sets are different, choosing the highest $$R^2$$ in each variable set and analyse the relative importance of each predictor for contributing to happiness score.
+  
+
+```{r important2015}
+
+regressor1 <- lm(Score~ . , data= data2015) # fit lm() model
+
+relImportance1 <- calc.relimp(regressor1, type = "lmg", rela = TRUE) # calculate relative importance scaled to 100
+
+tibble('R^2' =relImportance1$R2*100 , 'GDP' = relImportance1$lmg[1]*100,'Family' = relImportance1$lmg[2]*100,'Health' = relImportance1$lmg[3]*100,'Freedom' = relImportance1$lmg[4]*100,
+'Trust of Corruption' = relImportance1$lmg[5]*100,'Generosity' = relImportance1$lmg[6]*100)%>%
+  pivot_longer(cols = c('R^2', 'GDP','Family','Health','Freedom','Trust of Corruption','Generosity'), names_to = "Variable Information",values_to = "Important(%)") %>%
+  kable(caption = 'Variable importance in 2015') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+```{r important2016}
+regressor2 <- lm(Score~ . , data= data2016) # fit lm() model
+
+relImportance2 <- calc.relimp(regressor2, type = "lmg", rela = TRUE) # calculate relative importance scaled to 100
+tibble('R^2' =relImportance2$R2*100 , 'GDP' = relImportance2$lmg[1]*100,'Family' = relImportance2$lmg[2]*100,'Health' = relImportance2$lmg[3]*100,'Freedom' = relImportance2$lmg[4]*100,
+'Trust of Corruption' = relImportance2$lmg[5]*100,'Generosity' = relImportance2$lmg[6]*100)%>%
+  pivot_longer(cols = c('R^2', 'GDP','Family','Health','Freedom','Trust of Corruption','Generosity'), names_to = "Variable Information",values_to = "Important(%)") %>%
+  kable(caption = 'Variable importance in 2016') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+
+
+```{r important2017}
+
+
+regressor3 <- lm(Score~ . , data= data2017) # fit lm() model
+
+relImportance3 <- calc.relimp(regressor3, type = "lmg", rela = TRUE) # calculate relative importance scaled to 100
+tibble('R^2' =relImportance3$R2*100 , 'GDP' = relImportance3$lmg[1]*100,'Family' = relImportance3$lmg[2]*100,'Health' = relImportance3$lmg[3]*100,'Freedom' = relImportance3$lmg[4]*100,
+'Trust of Corruption' = relImportance3$lmg[6]*100,'Generosity' = relImportance3$lmg[5]*100)%>%
+  pivot_longer(cols = c('R^2', 'GDP','Family','Health','Freedom','Trust of Corruption','Generosity'), names_to = "Variable Information",values_to = "Important(%)") %>%
+  kable(caption = 'Variable importance in 2017') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+  
+
+
