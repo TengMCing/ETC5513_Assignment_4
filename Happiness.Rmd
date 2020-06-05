@@ -30,21 +30,71 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 5, fig.alig = "center")
+```
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(fpp3)
+library(relaimpo)
+library(GGally)
+library(kableExtra)
+```
+
+# Question 3 : Which variables are useful for modelling happiness scores and how the relationship between happiness scores and other factors?
+
+
+```{r loaddata}
+data2015 <- read.csv(here::here("Data/2015.csv"))
+data2016 <- read.csv(here::here("Data/2016.csv"))
+data2017 <- read.csv(here::here("Data/2017.csv"))
+data2018 <- read.csv(here::here("Data/2018.csv"))
+data2019 <- read.csv(here::here("Data/2019.csv"))
+```
+
+```{r renamevariable}
+data2015<-data2015%>% dplyr::select(-c(1,2,3,5,12))
+names(data2015)[1]<-"Score"
+names(data2015)[2]<-"GDP"
+names(data2015)[4]<-"Health"
+names(data2015)[6]<-"Trust of Corruption"
+#dplyr::rename('GDP'="Economy..GPD.per.Capita.",'Health'="Health..Life.Expectancy.",'Trust'="Trust..Government.Corruption.")
+
+data2016<-data2016%>% dplyr::select(-c(1,2,3,5,6,13))
+names(data2016)[1]<-"Score"
+names(data2016)[2]<-"GDP"
+names(data2016)[4]<-"Health"
+names(data2016)[6]<-"Trust of Corruption"
+
+data2017<-data2017%>% dplyr::select(-c(1,2,4,5,12))
+names(data2017)[1]<-"Score"
+names(data2017)[2]<-"GDP"
+names(data2017)[4]<-"Health"
+names(data2017)[7]<-"Trust of Corruption"
+
+data2018<-data2018%>% dplyr::select(-c(1,2))%>%mutate(`Perceptions.of.corruption`=as.numeric(Perceptions.of.corruption))
+names(data2018)[2]<-"GDP"
+names(data2018)[3]<-"Social Support"
+names(data2018)[4]<-"Health"
+names(data2018)[5]<-"Freedom"
+names(data2018)[7]<-"Perceptions of Corruption"
+
+data2019<-data2019%>% dplyr::select(-c(1,2))
+names(data2019)[2]<-"GDP"
+names(data2019)[3]<-"Social Support"
+names(data2019)[4]<-"Health"
+names(data2019)[5]<-"Freedom"
+names(data2019)[7]<-"Perceptions of Corruption"
 ```
 
 
-# Introduction
-
-In a famous paper, @BC64 introduced a family of transformations \dots
-
-```{r histogram, fig.cap="Nice histogram", message=FALSE, warning=FALSE}
-qplot(exp(rnorm(200)))
-```
-
-Consider the logNormal data plotted in Figure \ref{fig:histogram}.
-
-$$s^2 = \sum_{i=1}^n (x_i-\bar{x})^2$$
-
+  **To explore the factors that could be contributing to the happiness score differences between each years, differenct variables in each year will be displayed.**
+  
+  Firstly,after wrangling the data and comparing the variables, two different variable sets are established.
