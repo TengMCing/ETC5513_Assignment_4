@@ -38,6 +38,7 @@ library(ggplot2)
 library(here)
 library(tidyverse)
 library(readr)
+library(kableExtra)
 ```
 
 
@@ -53,10 +54,45 @@ happiness_2018 <- read_csv(here("data", "2018.csv"))
 happiness_2019 <- read_csv(here("data", "2019.csv"))
 ```
 
-```{r top20-countries-2015}
-top20_2015  <- happiness_2015 %>%
-  filter(`Happiness Rank` <= 20) %>%
+```{r top10-countries-2015}
+top10_2015  <- happiness_2015 %>%
+  filter(`Happiness Rank` <= 10) %>%
   select(Country, `Happiness Score`) %>%
+  rename("2015" = "Happiness Score")
+
+top10_2015 %>% 
+  arrange(desc(`2015`)) %>% 
+  kable(caption = "Top10 countries in 2015") %>%
+  kable_styling(bootstrap_options = c("bordered", "striped"))
+```
+
+```{r wrangling-2016-data}
+data_2016 <- happiness_2016 %>% 
+  select(Country, `Happiness Score`) %>% 
   rename("2016" = "Happiness Score")
 ```
+
+```{r wrangling-2017-data}
+data_2017 <- happiness_2017 %>% 
+  select(Country, Happiness.Score) %>% 
+  rename("2017" = "Happiness.Score")
+```
+
+```{r wrangling-2018-data}
+data_2018 <- happiness_2018 %>% 
+  select(`Country or region`, Score) %>% 
+  rename("2018" = "Score")
+```
+
+```{r wrangling-2019-data}
+data_2019 <- happiness_2019 %>% 
+  select(Country, `Happiness Score`) %>% 
+  rename("2019" = "Happiness Score")
+```
+
+
+
+
+
+
 
