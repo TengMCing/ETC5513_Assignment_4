@@ -13,5 +13,5 @@
 
 ## Q3.
 
-## Q4. What is the relationship between predictors and happiness score in a linear regression analysis?
+## Q4. What is the relationship between predictors and happiness score in linear regression analysis?
 - Weihao Li
