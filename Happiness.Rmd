@@ -31,9 +31,14 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
-# Make sure you have the latest versions of rmarkdown and bookdown installed
+```
+
+```{r library}
+library(gapminder)
 library(ggplot2)
+library(janitor)
 library(here)
+library(lubridate)
 library(tidyverse)
 ```
 
@@ -45,5 +50,119 @@ happiness_2018 <- read.csv(here::here("Data/2018.csv"))
 happiness_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
+# Data Wrangling
+
+```{r}
+# Extract Countries and Regions
+ctry_region <- happiness_2015 %>% select(Country, Region)
+```
+
+```{r data-wrangle}
+# Standardising df for all years before binding
+rename_vars <- function(df) {
+  df %>%
+    rename(
+      Overall.rank = Happiness.Rank,
+      Score = Happiness.Score,
+      GDP.per.capita = Economy..GDP.per.Capita.,
+      Social.support = Family,
+      Healthy.life.expectancy = Health..Life.Expectancy.,
+      Freedom.to.make.life.choices = Freedom,
+      Perceptions.of.corruption = Trust..Government.Corruption.
+    )
+}
+
+happiness_2015 <- happiness_2015 %>% 
+  select(- c(Region, Standard.Error, Dystopia.Residual)) %>%
+  mutate(year = year(ymd("2015-12-31")))
+
+happiness_2016 <- happiness_2016 %>% 
+  select(- c(Region, 
+             Lower.Confidence.Interval:Upper.Confidence.Interval,
+             Dystopia.Residual)) %>%
+  mutate(year = year(ymd("2016-12-31")))
+
+happiness_2017 <- happiness_2017 %>% 
+  select(- c(Dystopia.Residual,Whisker.high,Whisker.low)) %>%
+  mutate(year = year(ymd("2017-12-31")))
+
+# Standardise variables to df in 2018 and 2019
+happiness_2015 <- rename_vars(happiness_2015)
+happiness_2016 <- rename_vars(happiness_2016)
+happiness_2017 <- rename_vars(happiness_2017)
+
+happiness_2018 <- happiness_2018 %>% 
+  mutate(year = year(ymd("2018-12-31")),
+         Perceptions.of.corruption = as.numeric(Perceptions.of.corruption)) %>%
+  rename(Country = Country.or.region)
+  
+happiness_2019 <- happiness_2019 %>%
+  mutate(year = year(ymd("2019-12-31"))) %>% 
+  rename(Country = Country.or.region)
+
+happiness_all <- bind_rows(happiness_2015,
+                           happiness_2016,
+                           happiness_2017,
+                           happiness_2018,
+                           happiness_2019)
+```
+
+```{r rename-ctry}
+# Rename countries with conflicting names over years
+happiness_all$Country <- 
+  str_replace_all(happiness_all$Country, "Hong Kong S.A.R., China", "Hong Kong")
+
+happiness_all$Country <-
+  str_replace_all(happiness_all$Country, "Taiwan Province of China", "Taiwan") 
+
+happiness_all$Country <-
+  str_replace_all(happiness_all$Country, "Trinidad & Tobago", "Trinidad and Tobago") 
+
+happiness_all$Country <-
+  str_replace_all(happiness_all$Country, "Northern Cyprus", "North Cyprus") 
+```
+
+```{r}
+# Remove countries with less than 3 observations
+keep_ctry <- happiness_all %>%
+  count(Country) %>%
+  filter(n >= 3) 
+
+happiness_all <- semi_join(happiness_all, keep_ctry, by = "Country")
+```
+
+```{r}
+# Create new data frame, find countries without a region
+happiness_na_region <- 
+  full_join(happiness_all, ctry_region, by = "Country") %>%
+  filter(is.na(Region)) %>%
+  select(Country, Region) %>%
+  unique() 
+
+# Insert regions to NA regions
+happiness_na_region <- happiness_na_region %>% 
+  mutate(Region =
+           case_when(
+             str_detect(Country, "Belize") ~ "Latin America and Caribbean",
+             str_detect(Country, "Somalia") ~ "Sub-Saharan Africa",
+             str_detect(Country, "Namibia") ~ "Sub-Saharan Africa",
+             str_detect(Country, "South Sudan") ~ "Sub-Saharan Africa")) %>%
+  mutate(Region = as.factor(Region))
+
+# Insert countries and regions into df
+ctry_region <- full_join(ctry_region, happiness_na_region)
+
+# Include all regions in df
+happiness_all <- full_join(happiness_all, ctry_region, by = "Country", "Region") %>%
+  # Remove 5 countries in ctry_region df but not in joined df
+  filter(!is.na(Overall.rank))
+```
+
+# Analysis 1: World Map
+
+
+
+
+# Summary
 
 
