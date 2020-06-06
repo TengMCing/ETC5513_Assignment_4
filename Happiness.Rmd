@@ -173,8 +173,6 @@ lm(log_score~cpi+log_gdp+log_population+log_area,data=nona_hs) %>%
 ```
 
 
-We use variables mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
-
 ```{r lmcoeff}
 
 rownames(lm_sum$coefficients) = lm_sum$coefficients %>%
@@ -188,6 +186,8 @@ lm_sum$coefficients %>%
                caption = "Linear regression model for happiness scores. The $R^2$ of this model is 0.7264.") %>%
   kableExtra::kable_styling(latex_options = "striped")
 ```
+
+We use variables mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
 
 \begin{align*}
 \text{log(Happiness Score)} = & \ 0.3208 + 0.0005\text{ CPI} + 0.1285 \text{ log(GDP)} \\
