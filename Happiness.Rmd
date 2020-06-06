@@ -75,7 +75,7 @@ happiness_all <- happiness_all %>%
   filter(!(Country %in% c("Gambia", "Swaziland", "Comoros")))
 ```
 
-```{r}
+```{r ctry-region}
 # Extract Countries and Regions from 2015 df
 ctry_region <- happiness_2015 %>% 
   select(Country, Region)
@@ -91,7 +91,7 @@ ctry_region$Country <-
     "Somaliland region" = "Somalia")
 ```
 
-```{r}
+```{r add-ctry-region}
 # Insert regions to NA regions
 ctry_region <- ctry_region %>% 
   add_row(Country = "Belize", Region = "Latin America and Caribbean") %>%
@@ -100,7 +100,7 @@ ctry_region <- ctry_region %>%
   mutate(Region = as.factor(Region)) 
 ```
 
-```{r}
+```{r join-happiness-region}
 # Include regions in df
 # Clean names
 happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
@@ -109,11 +109,11 @@ happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
 
 # Analysis 1: World Map
 
-```{r}
+```{r world-map-data}
 map_world <- map_data("world")
 ```
 
-```{r}
+```{r conflict-names, include = FALSE}
 # Find conflicting names
 setdiff(happiness_all$country, map_world$region)
 ```
@@ -144,8 +144,10 @@ map_combined <-
 ```
 
 ```{r}
-ggplot() +
-  geom_polygon(data = map_combined, aes(x = long, y = lat, group = group, fill = score))
+ggplot(data = map_combined) +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = score)) +
+  coord_equal() +
+  ggtitle("Happiness Attribute Scores around the World")
 
 library(plotly)
 ggplotly()
