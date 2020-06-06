@@ -34,64 +34,26 @@ knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 ```
 
 ```{r library}
-library(gapminder)
 library(ggplot2)
 library(janitor)
 library(here)
 library(lubridate)
+library(rnaturalearth)
+library(sf)
 library(tidyverse)
 ```
 
 ```{r read-in, cache = TRUE}
-happiness_2015 <- read.csv(here::here("Data/2015.csv"))
-happiness_2016 <- read.csv(here::here("Data/2016.csv"))
-happiness_2017 <- read.csv(here::here("Data/2017.csv"))
+happiness_2015 <- read.csv(here::here("Data/2015.csv")) # To extract region info
 happiness_2018 <- read.csv(here::here("Data/2018.csv"))
 happiness_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
 # Data Wrangling
 
-```{r}
-# Extract Countries and Regions
-ctry_region <- happiness_2015 %>% select(Country, Region)
-```
-
 ```{r data-wrangle}
-# Standardising df for all years before binding
-rename_vars <- function(df) {
-  df %>%
-    rename(
-      Overall.rank = Happiness.Rank,
-      Score = Happiness.Score,
-      GDP.per.capita = Economy..GDP.per.Capita.,
-      Social.support = Family,
-      Healthy.life.expectancy = Health..Life.Expectancy.,
-      Freedom.to.make.life.choices = Freedom,
-      Perceptions.of.corruption = Trust..Government.Corruption.
-    )
-}
-
-happiness_2015 <- happiness_2015 %>% 
-  select(- c(Region, Standard.Error, Dystopia.Residual)) %>%
-  mutate(year = year(ymd("2015-12-31")))
-
-happiness_2016 <- happiness_2016 %>% 
-  select(- c(Region, 
-             Lower.Confidence.Interval:Upper.Confidence.Interval,
-             Dystopia.Residual)) %>%
-  mutate(year = year(ymd("2016-12-31")))
-
-happiness_2017 <- happiness_2017 %>% 
-  select(- c(Dystopia.Residual,Whisker.high,Whisker.low)) %>%
-  mutate(year = year(ymd("2017-12-31")))
-
-# Standardise variables to df in 2018 and 2019
-happiness_2015 <- rename_vars(happiness_2015)
-happiness_2016 <- rename_vars(happiness_2016)
-happiness_2017 <- rename_vars(happiness_2017)
-
 happiness_2018 <- happiness_2018 %>% 
+  # Add year
   mutate(year = year(ymd("2018-12-31")),
          Perceptions.of.corruption = as.numeric(Perceptions.of.corruption)) %>%
   rename(Country = Country.or.region)
@@ -100,71 +62,112 @@ happiness_2019 <- happiness_2019 %>%
   mutate(year = year(ymd("2019-12-31"))) %>% 
   rename(Country = Country.or.region)
 
-happiness_all <- bind_rows(happiness_2015,
-                           happiness_2016,
-                           happiness_2017,
-                           happiness_2018,
+happiness_all <- bind_rows(happiness_2018,
                            happiness_2019)
-```
 
-```{r rename-ctry}
-# Rename countries with conflicting names over years
-happiness_all$Country <- 
-  str_replace_all(happiness_all$Country, "Hong Kong S.A.R., China", "Hong Kong")
+# Find conflicting names and countries in 2019 not in 2018
+# setdiff(happiness_2019$Country, happiness_2018$Country) 
 
 happiness_all$Country <-
-  str_replace_all(happiness_all$Country, "Taiwan Province of China", "Taiwan") 
+  recode(happiness_all$Country, "North Macedonia" = "Macedonia")
 
-happiness_all$Country <-
-  str_replace_all(happiness_all$Country, "Trinidad & Tobago", "Trinidad and Tobago") 
-
-happiness_all$Country <-
-  str_replace_all(happiness_all$Country, "Northern Cyprus", "North Cyprus") 
+happiness_all <- happiness_all %>%
+  filter(!(Country %in% c("Gambia", "Swaziland", "Comoros")))
 ```
 
 ```{r}
-# Remove countries with less than 3 observations
-keep_ctry <- happiness_all %>%
-  count(Country) %>%
-  filter(n >= 3) 
+# Extract Countries and Regions from 2015 df
+ctry_region <- happiness_2015 %>% 
+  select(Country, Region)
 
-happiness_all <- semi_join(happiness_all, keep_ctry, by = "Country")
+# Find countries that do not have a region
+setdiff(happiness_all$Country, ctry_region$Country) 
+
+ctry_region$Country <-
+  recode(
+    ctry_region$Country,
+    "North Cyprus" = "Northern Cyprus",
+    "Trinidad and Tobago" = "Trinidad & Tobago",
+    "Somaliland region" = "Somalia")
 ```
 
 ```{r}
-# Create new data frame, find countries without a region
-happiness_na_region <- 
-  full_join(happiness_all, ctry_region, by = "Country") %>%
-  filter(is.na(Region)) %>%
-  select(Country, Region) %>%
-  unique() 
-
 # Insert regions to NA regions
-happiness_na_region <- happiness_na_region %>% 
-  mutate(Region =
-           case_when(
-             str_detect(Country, "Belize") ~ "Latin America and Caribbean",
-             str_detect(Country, "Somalia") ~ "Sub-Saharan Africa",
-             str_detect(Country, "Namibia") ~ "Sub-Saharan Africa",
-             str_detect(Country, "South Sudan") ~ "Sub-Saharan Africa")) %>%
-  mutate(Region = as.factor(Region))
+ctry_region <- ctry_region %>% 
+  add_row(Country = "Belize", Region = "Latin America and Caribbean") %>%
+  add_row(Country = "Namibia", Region = "Sub-Saharan Africa") %>%
+  add_row(Country = "South Sudan", Region = "Sub-Saharan Africa") %>%
+  mutate(Region = as.factor(Region)) 
+```
 
-# Insert countries and regions into df
-ctry_region <- full_join(ctry_region, happiness_na_region)
-
-# Include all regions in df
+```{r}
+# Include regions in df
+# Clean names
 happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
-  # Remove 5 countries in ctry_region df but not in joined df
-  filter(!is.na(Overall.rank)) %>%
-  # Replace full stop with "_"
   clean_names()
 ```
 
 # Analysis 1: World Map
 
+```{r}
+map_world <- map_data("world")
+```
+
+```{r}
+# Find conflicting names
+setdiff(happiness_all$country, map_world$region)
+```
+
+```{r test, eval = FALSE}
+# Create new df for map
+happiness_map <- happiness_all
+
+# Solve conflicting names
+happiness_map$country <-
+  recode(
+    happiness_map$country,
+    "United Kingdom" = "UK",
+    "United States" = "USA",
+    "Trinidad & Tobago" = "Trinidad",
+    "Northern Cyprus" = "Cyprus",
+    "Hong Kong" = "China",
+    "Palestinian Territories" = "Palestine",
+    "Congo (Brazzaville)" = "Republic of Congo",
+    "Congo (Kinshasa)" = "Democratic Republic of the Congo",
+  )
+```
+
+```{r}
+# Join map and happiness data
+map_combined <- 
+  left_join(map_world, happiness_map, by = c('region' = 'country')) 
+```
+
+```{r}
+ggplot() +
+  geom_polygon(data = map_combined, aes(x = long, y = lat, group = group, fill = score))
+
+library(plotly)
+ggplotly()
+```
+
+
+# Analysis 2: Population Data
+```{r}
+require(rnaturalearth)
+world <- ne_countries(scale = "medium", returnclass = "sf") 
+
+setdiff(happiness_all$country, world$name)
+```
+
+```{r}
+pop_ests <- readxl::read_xlsx("WPP2019_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx")
+```
 
 
 
-# Summary
+
+
+
 
 
