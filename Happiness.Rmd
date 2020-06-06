@@ -37,7 +37,9 @@ library(tidyverse)
 ```
 
 
-# Q4. What is the relationship between predictors and happiness score?
+# Q4. What is the relationship between predictors and happiness score in a linear regression analysis?
+
+
 
 ```{r message=FALSE}
 h15 = read_csv("Data/2015.csv")
@@ -162,14 +164,16 @@ as_tibble(world_map) %>%
 nona_hs = na.omit(hs)
 
 nona_hs = nona_hs %>%
-  mutate(log_score = log(`Happiness Score`), log_cpi = log(cpi), log_gdp = log(gdp), log_area = log(area), log_population = log(population)) %>%
-  select(log_score:log_population)
+  mutate(log_score = log(`Happiness Score`), log_gdp = log(gdp), log_area = log(area), log_population = log(population)) %>%
+  select(log_score:log_population, name, year, cpi)
 
-lm(log_score~log_cpi+log_gdp+log_population+log_area,data=nona_hs) %>%
+lm(log_score~cpi+log_gdp+log_population+log_area,data=nona_hs) %>%
   summary() -> lm_sum
 
 ```
 
+
+We use variables mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
 
 ```{r lmcoeff}
 
@@ -181,36 +185,103 @@ lm_sum$coefficients %>%
   knitr::kable('latex', 
                digits = 4, 
                booktabs = TRUE,
-               caption = "Linear regression model for happiness scores. The $R^2$ of this model is 0.7288.") %>%
+               caption = "Linear regression model for happiness scores. The $R^2$ of this model is 0.7264.") %>%
   kableExtra::kable_styling(latex_options = "striped")
 ```
 
-We use variables which mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
-
 \begin{align*}
-\text{log(Happiness Score)} = & \ 0.3208 + 0.0025\text{ log(CPI)} + 0.1279 \text{ log(GDP)} \\
-&- 0.1223 \text{ log(Population)} + 0.0057 \text{ log(Area)}
+\text{log(Happiness Score)} = & \ 0.3208 + 0.0005\text{ CPI} + 0.1285 \text{ log(GDP)} \\
+&- 0.1218 \text{ log(Population)} + 0.0056 \text{ log(Area)}
 \end{align*}
 
-Notice that only the intercpet, log of GDP and the log of population are significant with $\alpha = 5$%. Since we take log on both response variable and regressors, we can interpret them as the elasticity of happiness score of GDP and the elasticity of happiness score of population. This can be proved by:
+Notice that only the intercept, log of GDP and the log of the population are significant with $\alpha = 5$%. Since we take logarithm on both response variable and regressors except CPI given it is a percentage index, we can interpret them as the elasticity of happiness score of GDP and the elasticity of happiness score of the population. This can be proved by:
 
 \begin{align}
-\frac{\partial \text{log(Happiness Score)}}{\partial \text{log(GDP)}} &= 0.1279\\
+\frac{\partial \text{log(Happiness Score)}}{\partial \text{log(GDP)}} &= 0.1285\\
 \intertext{From (1) we can say, when other variables remain constant }\nonumber \\
-\Delta \text{ log(Happiness Score)} &= 0.1279 \Delta \text{ log(GDP)}\\
+\Delta \text{ log(Happiness Score)} &= 0.1285 \Delta \text{ log(GDP)}\\
 \intertext{By using the linear approximation of log function, we can know}\nonumber\\
 log(x_0 + \Delta x) - log(x_0) &\approx log(x_0) + log'(x_0)\Delta x - log(x_0)\\
 &=  \frac{\Delta x}{x_0} = \text{percentage change in x}\nonumber\\
 \intertext{Therefore}\nonumber\\
 \frac{\Delta \text{ log(Happiness Score)}}{\Delta \text{ log(GDP)}} &\approx \frac{\Delta \text{ Happiness Score}}{\Delta \text{ GDP} }\frac{\text{GDP}}{\text{Happiness Score}}\\
 &=\frac{\% \Delta \text{ Happiness Score}}{\% \Delta \text{ GDP}} \nonumber\\
-&= 0.1279\nonumber
+&= 0.1285\nonumber
 \end{align}
 
-Now we can interpret the result from Table \ref{tab:lmcoeff}. We will only report variables that are statistically significant. Roughly, a 1% increase in GDP leads to a 0.1279% rise in the happiness score, and a 1% increase in population leads to a 0.1223% fall in the happiness score.
+Now we can interpret the result from Table \ref{tab:lmcoeff}. Only variables that are statistically significant will be reported. Roughly, a 1% increase in GDP leads to a 0.1285% rise in the happiness score, and a 1% increase in population leads to a 0.1218% fall in the happiness score.
+
+```{r}
+world_map$not_included = is.na(sapply(world_map$name, match, table = hs$name))
+```
+
+```{r namap, fig.cap="The world map of missing countries in our dataset"}
+ggplot()+
+  geom_sf(data = world_map, aes(fill = not_included))+
+  ggtitle("World map of countries that are not included in our dataset") +
+  theme_bw()+
+  theme(legend.position = 'bottom') +
+  labs(fill = "Not included")
+```
 
 
-Apparently, the happiness score can be affected by others factors that correlated with regressors and doesn't include in our model, such as education index and social welfare system. It means endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include more variables that we think will be useful for hapiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression.
+Apparently, the happiness score can be affected by other factors that correlated with regressors and doesn't include in our model, such as the education index and the social welfare system. It means an endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include other variables that we think will be useful for happiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression. Besides, another issue with our model is the sample selection problem. There are only 126 countries with completed cases in our final dataset, which means 69 countries are not considered. Figure \ref{fig:namap} shows the map of missing countries. According to the map, most of the countries being omitted are developing countries. It indicates that our samples are not randomly selected from the population, and we are facing an observability issue. It can be expected that the happiness scores in those countries are lower than the average, which suggests we potentially underestimate our coefficients in OLS. 
 
+The diagnostics of our regression is shown in Figure \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. Figure \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
+
+
+
+
+
+
+```{r dig, fig.cap="Regression diagnostics for checking heteroskedasticity, non-normality and influential points", message=FALSE, fig.height=10}
+library(ggrepel)
+mod = lm(log_score~cpi+log_gdp+log_population+log_area,data=nona_hs)
+
+mod_detail = broom::augment(mod, data = nona_hs)
+p1 = ggplot(mod_detail) +
+  geom_point(aes(.fitted, .resid)) +
+  geom_smooth(aes(.fitted, .resid))
+
+p2 = ggplot(mod_detail) +
+  geom_qq(aes(sample = .resid)) +
+  geom_qq_line(aes(sample = .resid))
+
+p3 = ggplot(mod_detail) +
+  geom_point(aes(.fitted, .cooksd)) +
+  geom_text_repel(data = filter(mod_detail, .cooksd>0.0083), aes(.fitted, .cooksd, label = paste0(name,',',year)), col = 'red') +
+  geom_point(data = filter(mod_detail, .cooksd>0.0083), aes(.fitted, .cooksd), col="blue")
+
+library(gridExtra)
+grid.arrange(arrangeGrob(p1,p2, ncol=2),
+         arrangeGrob(p3, ncol=1, nrow=1), top = "Regression diagnostics\n Top left: Residuals vs Fitted. Top right: Normal QQ plot. Bottom:  Cooks distances vs Fitted.", heights=c(1,2))
+```
+
+
+```{r ip, fig.cap="Diagnostics for influential data points", fig.height=10}
+p1 = ggplot()+
+  geom_sf(data = world_map, aes(fill = name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi'))) +
+  theme_bw()+
+  theme(legend.position = "bottom") +
+  labs(fill = 'With influential points') 
+
+p2 = ggplot(mod_detail) +
+  geom_point(aes(log_gdp,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_gdp,.fitted),col="red")
+
+p3 = ggplot(mod_detail) +
+  geom_point(aes(cpi,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(cpi,.fitted),col="red")
+
+p4 = ggplot(mod_detail) +
+  geom_point(aes(log_population,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_population,.fitted),col="red")
+
+p5 = ggplot(mod_detail) +
+  geom_point(aes(log_area,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_area,.fitted),col="red")
+
+grid.arrange(p1, arrangeGrob(p2, p3, p4,p5, ncol=2), top = "Diagnostics for influential data points\n Top: World map of countries with influential data points. \n Bottom: Scatter plots of fitted value against each regressor. Red dots represent the infulential data points.", ncol=1, heights =c(2,1))
+```
 
 
