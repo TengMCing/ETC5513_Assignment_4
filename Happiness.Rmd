@@ -40,6 +40,7 @@ library(tidyverse)
 library(readr)
 library(kableExtra)
 library(lubridate)
+library(graphics)
 ```
 
 
@@ -110,7 +111,42 @@ total_data_plot %>%
   geom_point(aes(shape = Country))
 ```
 
+```{r Whole-world-comparison-2015, fig.cap="The percentage of the number of countries above or below average happiness scores in 2015"}
+total_countries_2015 <- happiness_2015 %>% 
+  select(Country) %>% count()
 
+comparison_2015 <- happiness_2015 %>% 
+  mutate(total_countries = total_countries_2015$n, average_score = mean(`Happiness Score`)) %>% 
+  filter(`Happiness Score` > average_score) %>% 
+  mutate(above_average = length(Region), below_average = total_countries - above_average)
+
+comparison_2015 %>% 
+  select(above_average, below_average) %>% 
+  unique() %>% 
+  pivot_longer(c("above_average", "below_average"), names_to = "average", values_to = "count") %>% 
+  mutate(percentage = round(count/sum(count) * 100, digits = 2)) %>% 
+  mutate(percentage_label = paste(percentage, "%")) %>%
+  ggplot(aes("", percentage, fill = average)) + 
+  geom_col(stat = "identify", width = 1) + 
+  coord_polar("y", start = 0, direction = -1) +
+  theme_void() + 
+  geom_text(aes(x = 1, y = cumsum(percentage) - percentage/2, label = percentage_label)) + 
+  ggtitle("The percentage of above or below average score in 2015")
+
+```
+
+```{r regions-comparison-2015, fig.cap="The number of above average happiness scores across regions in 2015", fig.height=4, fig.width=11}
+comparison_2015 %>% 
+  group_by(Region) %>% 
+  count() %>% 
+  ggplot(aes(reorder(Region, n), n)) + 
+  geom_col(aes(fill = Region)) + 
+  coord_flip() + 
+  xlab("region") + 
+  ylab("count") + 
+  scale_y_continuous(breaks = seq(0, 20, by = 1))
+  
+```
 
 
 
