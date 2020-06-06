@@ -229,6 +229,8 @@ Apparently, the happiness score can be affected by other factors that correlated
 
 The diagnostics of our regression is shown in Figure \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. Figure \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
 
+In conclusion, this model does a solid job in explaining the relationship between happiness score and our regressors if our point of interest is countries outside Africa. 
+
 
 
 
