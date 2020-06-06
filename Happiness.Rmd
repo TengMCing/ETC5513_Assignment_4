@@ -153,9 +153,11 @@ happiness_na_region <- happiness_na_region %>%
 ctry_region <- full_join(ctry_region, happiness_na_region)
 
 # Include all regions in df
-happiness_all <- full_join(happiness_all, ctry_region, by = "Country", "Region") %>%
+happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
   # Remove 5 countries in ctry_region df but not in joined df
-  filter(!is.na(Overall.rank))
+  filter(!is.na(Overall.rank)) %>%
+  # Replace full stop with "_"
+  clean_names()
 ```
 
 # Analysis 1: World Map
