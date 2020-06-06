@@ -118,7 +118,7 @@ total_countries_2015 <- happiness_2015 %>%
 comparison_2015 <- happiness_2015 %>% 
   mutate(total_countries = total_countries_2015$n, average_score = mean(`Happiness Score`)) %>% 
   filter(`Happiness Score` > average_score) %>% 
-  mutate(above_average = length(Region), below_average = total_countries - above_average)
+  mutate(above_average = length(Country), below_average = total_countries - above_average)
 
 comparison_2015 %>% 
   select(above_average, below_average) %>% 
@@ -127,10 +127,10 @@ comparison_2015 %>%
   mutate(percentage = round(count/sum(count) * 100, digits = 2)) %>% 
   mutate(percentage_label = paste(percentage, "%")) %>%
   ggplot(aes("", percentage, fill = average)) + 
-  geom_col(stat = "identify", width = 1) + 
+  geom_col(stat= "identity", width = 1) + 
   coord_polar("y", start = 0, direction = -1) +
   theme_void() + 
-  geom_text(aes(x = 1, y = cumsum(percentage) - percentage/2, label = percentage_label)) + 
+  geom_text(position = position_stack(vjust = 0.5), aes(label = percentage_label)) + 
   ggtitle("The percentage of above or below average score in 2015")
 
 ```
@@ -148,5 +148,44 @@ comparison_2015 %>%
   
 ```
 
+```{r Whole-world-comparison-2019, fig.cap="The percentage of the number of countries above or below average happiness scores in 2019"}
+
+total_countries_2019 <- happiness_2019 %>% 
+  select(`Country or region`) %>% count()
+
+comparison_2019 <- happiness_2019 %>% 
+  mutate(total_countries = total_countries_2019$n, average_score = mean(Score)) %>% 
+  filter(Score > average_score) %>% 
+  mutate(above_average = length(`Country or region`), below_average = total_countries - above_average)
+
+comparison_2019 %>% 
+  select(above_average, below_average) %>% 
+  unique() %>% 
+  pivot_longer(c("above_average", "below_average"), names_to = "average", values_to = "count") %>% 
+  mutate(per = round(count/sum(count) * 100, digits = 2)) %>% 
+  mutate(per_label = paste(per, "%")) %>%
+  ggplot(aes("", per, fill = average)) + 
+  geom_col(stat = "identify", width = 1) + 
+  coord_polar("y", start = 0, direction = -1) +
+  theme_void() + 
+  geom_text(aes(label = per_label), position = position_stack(vjust = 0.5)) + 
+  ggtitle("The percentage of above or below average score in 2019")
+```
+
+```{r regions-comparison-2019, fig.cap="The number of above average happiness scores across regions in 2019", fig.height=4, fig.width=11}
+
+region <- happiness_2015 %>% select(Country, Region)
 
 
+comparison_2019 %>% 
+  left_join(region, by=c("Country or region" = "Country")) %>%
+  filter(!is.na(Region)) %>% 
+  group_by(Region) %>%
+  count() %>% 
+  ggplot(aes(reorder(Region, n), n, fill = Region)) + 
+  geom_col() +
+  coord_flip() +
+  xlab("region") +
+  ylab("count") + 
+  scale_y_continuous(breaks = seq(0,20, by = 1))
+```
