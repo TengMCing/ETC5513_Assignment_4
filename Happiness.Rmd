@@ -33,23 +33,25 @@ output:
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 ```
 
-```{r library}
+```{r library, include = FALSE, warning = FALSE}
 library(ggplot2)
-library(janitor)
 library(here)
+library(janitor)
 library(lubridate)
-library(rnaturalearth)
-library(sf)
+library(plotly)
 library(tidyverse)
+require(wbstats)
 ```
 
-```{r read-in, cache = TRUE}
+```{r read-in, cache = TRUE, include = FALSE}
 happiness_2015 <- read.csv(here::here("Data/2015.csv")) # To extract region info
 happiness_2018 <- read.csv(here::here("Data/2018.csv"))
 happiness_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
-# Data Wrangling
+# Happiness and Attribute Scores across the Globe
+
+## Design and Methodology
 
 ```{r data-wrangle}
 happiness_2018 <- happiness_2018 %>% 
@@ -107,7 +109,7 @@ happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
   clean_names()
 ```
 
-# Analysis 1: World Map
+# Analysis 1: 2019 Happiness Scores on the World Map
 
 ```{r world-map-data}
 map_world <- map_data("world")
@@ -118,7 +120,7 @@ map_world <- map_data("world")
 setdiff(happiness_all$country, map_world$region)
 ```
 
-```{r test, eval = FALSE}
+```{r cleaning-ctry-names}
 # Create new df for map
 happiness_map <- happiness_all
 
@@ -133,39 +135,133 @@ happiness_map$country <-
     "Hong Kong" = "China",
     "Palestinian Territories" = "Palestine",
     "Congo (Brazzaville)" = "Republic of Congo",
-    "Congo (Kinshasa)" = "Democratic Republic of the Congo",
-  )
+    "Congo (Kinshasa)" = "Democratic Republic of the Congo")
 ```
 
-```{r}
+```{r happiness-map-combine}
 # Join map and happiness data
 map_combined <- 
   left_join(map_world, happiness_map, by = c('region' = 'country')) 
 ```
 
-```{r}
+```{r world-happiness-map}
 ggplot(data = map_combined) +
-  geom_polygon(aes(x = long, y = lat, group = group, fill = score)) +
+  geom_polygon(aes(
+    x = long,
+    y = lat,
+    group = group,
+    fill = score
+  ), colour = "black") +
   coord_equal() +
-  ggtitle("Happiness Attribute Scores around the World")
-
-library(plotly)
-ggplotly()
+  scale_fill_distiller(palette = "PRGn", 
+                       na.value = "light grey",
+                       limits = c(2, 8)) +
+  theme(
+  axis.text = element_blank(),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  panel.background = element_rect(fill = "light blue"),
+  plot.title = element_text(hjust = 0.5, size = 20,face = "bold")) +
+  ggtitle("Happiness Attribute Scores around the World") +
+  theme(legend.position= "bottom")
 ```
 
+# Analysis 2: Compare attribute scores across countries
 
-# Analysis 2: Population Data
 ```{r}
-require(rnaturalearth)
-world <- ne_countries(scale = "medium", returnclass = "sf") 
-
-setdiff(happiness_all$country, world$name)
+# Place all attribute scores on one variable for plotting
+happiness_attr2019 <- happiness_all %>%
+  filter(year == 2019) %>%
+  pivot_longer(cols = gdp_per_capita:perceptions_of_corruption, 
+               names_to = "attr",
+               values_to = "attr_score") 
 ```
 
 ```{r}
-pop_ests <- readxl::read_xlsx("WPP2019_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx")
+require(wbstats)
+# Population, total
+pop_ests2018 <- wb(indicator = "SP.POP.TOTL", startdate = 2018, enddate = 2019)
+
+pop_ests2018 <- pop_ests2018 %>%
+  select(country, value) %>%
+  rename(pop_total = value)
 ```
 
+```{r}
+# Make country names consistent with population data 
+# setdiff(happiness_attr2019$country,pop_ests2018$country)
+happiness_attr2019$country <-
+  recode(
+    happiness_attr2019$country,
+    "Taiwan" = "China",
+    "Slovakia" = "Slovak Republic",
+    "Trinidad & Tobago" = "Trinidad and Tobago",
+    "South Korea" = "Korea, Rep.",
+    "Northern Cyprus" = "Cyprus",
+    "Russia" = "Russian Federation",
+    "Hong Kong" = "Hong Kong SAR, China",
+    "Macedonia" = "North Macedonia", 
+    "Kyrgyzstan" = "Kyrgyz Republic",
+    "Ivory Coast" = "Cote d'Ivoire",
+    "Congo (Brazzaville)" = "Congo, Rep.",
+    "Laos" = "Lao PDR",
+    "Venezuela" = "Venezuela, RB",
+    "Palestinian Territories" = "West Bank and Gaza",
+    "Iran" = "Iran, Islamic Rep.",
+    "Congo (Kinshasa)" = "Congo, Dem. Rep.",
+    "Egypt" = "Egypt, Arab Rep.",
+    "Syria" = "Syrian Arab Republic",
+    "Yemen" = "Yemen, Rep.")
+
+# Filter only countries in happiness dataset
+happiness_attr2019 <- 
+  full_join(happiness_attr2019, pop_ests2018, by = "country") %>%
+  filter(!is.na(overall_rank))
+```
+
+```{r}
+# Compute average attribute scores for each attribute
+attr_scores2019 <- happiness_attr2019 %>%
+  group_by(attr) %>%
+  summarise(mean_attr_score = mean(attr_score))
+
+# Insert average attribute scores in df
+happiness_attr2019 <- full_join(happiness_attr2019, attr_scores2019, by = "attr")
+
+
+```
+
+```{r happiness_attr2019, fig.width = 6, fig.height = 6, fig.align= "center"}
+ggplot(data = happiness_attr2019,
+       aes(x = 1:nrow(happiness_attr2019), # x: number of rows in dataset
+           y = attr_score)) +
+  geom_point(aes(
+    colour = region,
+    alpha = 0.5,
+    size = pop_total
+  )) +
+  # Remove x-axis title, lable and ticks
+   theme(axis.title.x=element_blank(),
+         axis.text.x=element_blank(),
+         axis.ticks.x=element_blank()) +
+  facet_wrap(~ attr, 
+             scales = "free_y", # rescale each attribute score
+             ncol = 3,
+             nrow = 2,
+             strip.position = "bottom"
+             ) +
+  geom_line(aes(y = mean_attr_score, # Add average attribute 
+                x = 1:nrow(happiness_attr2019),
+                group = attr),
+            colour = "black",
+            alpha = 0.7,
+            linetype = "dashed") +
+  labs(y = "Attribute Scores") +
+  theme(legend.position = "none")
+```
 
 
 
