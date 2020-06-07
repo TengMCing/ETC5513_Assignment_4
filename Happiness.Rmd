@@ -59,9 +59,11 @@ happiness_2019 <- read_csv(here("data", "2019.csv"))
 ```
 
 ```{r wrangling-2016-data}
+
 data_2016 <- happiness_2016 %>% 
   select(Country, `Happiness Score`) %>% 
-  rename("2016-01-01" = "Happiness Score")
+  rename("2016-01-01" = "Happiness Score") 
+# The reason why rename by "year-01-01" is trying to transfer the type as date and extracted the year for plotting the line chart
 ```
 
 ```{r wrangling-2017-data}
@@ -90,15 +92,17 @@ total_countries_2015 <- happiness_2015 %>%
 
 comparison_2015 <- happiness_2015 %>% 
   mutate(total_countries = total_countries_2015$n, average_score = mean(`Happiness Score`)) %>% 
+  #mutate the total number to calculate the number of countries that below and above the average
   filter(`Happiness Score` > average_score) %>% 
   mutate(above_average = length(Country), below_average = total_countries - above_average)
 
+# Try to make a pie chart of 2015 and show the pecentage in the plot
 pie_2015 <- comparison_2015 %>% 
   select(above_average, below_average) %>% 
   unique() %>% 
   pivot_longer(c("above_average", "below_average"), names_to = "average", values_to = "count") %>% 
   mutate(percentage = round(count/sum(count) * 100, digits = 2)) %>% 
-  mutate(percentage_label = paste(percentage, "%")) %>%
+  mutate(percentage_label = paste(percentage, "%")) %>%    # To make the label as percentage format
   ggplot(aes("", percentage, fill = average)) + 
   geom_col(stat= "identity", width = 1) + 
   coord_polar("y", start = 0, direction = -1) +
@@ -118,6 +122,7 @@ comparison_2019 <- happiness_2019 %>%
   filter(Score > average_score) %>% 
   mutate(above_average = length(`Country or region`), below_average = total_countries - above_average)
 
+# Try to make a pie chart of 2019 and show the pecentage in the plot
 pie_2019 <- comparison_2019 %>% 
   select(above_average, below_average) %>% 
   unique() %>% 
@@ -126,7 +131,7 @@ pie_2019 <- comparison_2019 %>%
   mutate(per_label = paste(per, "%")) %>%
   ggplot(aes("", per, fill = average)) + 
   geom_col(stat = "identify", width = 1) + 
-  coord_polar("y", start = 0, direction = -1) +
+  coord_polar("y", start = 0, direction = -1) +    #-1 make the smaller part at the right hand side
   theme_void() + 
   geom_text(aes(label = per_label), position = position_stack(vjust = 0.5)) + 
   ggtitle("The comparison of average score in 2019")
@@ -141,6 +146,7 @@ pie_2019 <- comparison_2019 %>%
 In this part, the top ten countries in 2015 have been extracted to consider how their happiness changing during the five years. According to table \@ref(tab:top10-countries-2015), it has shown that Switzerland
 
 ```{r top10-countries-2015}
+# Show the top10 countries in 2015 and plot a table
 top10_2015  <- happiness_2015 %>%
   filter(`Happiness Rank` <= 10) %>%
   select(Country, `Happiness Score`) %>%
@@ -156,11 +162,13 @@ top10_2015 %>%
 has occupied first place in 2015, which was around 7.59 points. While Iceland was around 0.02 standing in second place. In addition, Australia was the tenth country, which was around 7.28. Based on figure \@ref(fig:score-trends), which has shown that Finland was the country with a significant increase over
 
 ```{r join-data-frame}
+# Put all the happiness score data together 
 total_data <- list(top10_2015, data_2016, data_2017, data_2018, data_2019) %>%
   reduce(left_join, by = "Country")
 ```
 
 ```{r score-trends, fig.cap = "The trends in happiness scores from 2015-2019 (based on the top10 countries in 2015)"}
+# Extract the year, and plot the changing of happiness score based on each year in line chart
 total_data_plot <- total_data %>%
   pivot_longer(c(`2015-01-01`,`2016-01-01`,`2017-01-01`,`2018-01-01`,`2019-01-01`), names_to = "year", values_to = "score") %>% 
   mutate(year = year(year))
@@ -178,6 +186,7 @@ five years. Finland has increased from just over 7.4 to around 7.77 and has beco
 Besides, this report has also considered the changing of regional happiness. Firstly, this report has explored the percentage of the number of countries which happiness scores above or below the world average level in 2015 and 2019 to consider the overall condition. According to figure \@ref(fig:combination-plots-2015-2019), the percentage of the above-average level has accounted for
 
 ```{r combination-plots-2015-2019, fig.cap="The percentage of the number of countries above or below average happiness scores in 2015 and 2019"}
+# Combine the above two pie charts
 plot_grid(pie_2015,pie_2019, ncol=2)
 ```
 
@@ -185,6 +194,7 @@ plot_grid(pie_2015,pie_2019, ncol=2)
 To study the deeper level, figure \@ref(fig:regions-comparison-2015) has explained the number of
 
 ```{r regions-comparison-2015, fig.cap="The number of above average happiness scores across regions in 2015", fig.height=4, fig.width=11}
+# Show the number of countries that above the average score in 2015, group by each regions
 comparison_2015 %>% 
   group_by(Region) %>% 
   count() %>% 
@@ -200,9 +210,8 @@ comparison_2015 %>%
 countries that above-average level of each region in 2015. According to that figure, Western Europe, and the region of Latin America and the Caribbean have the highest number, which was 19 countries respectively. While the region of Sub-Saharan Africa has only one country that above the average level in 2015. Furthermore, based on figure \@ref(fig:regions-comparison-2019), western Europe has still stood
 
 ```{r regions-comparison-2019, fig.cap="The number of above average happiness scores across regions in 2019", fig.height=4, fig.width=11}
-
+# Show the number of countries that above the average score in 2019, group by each regions
 region <- happiness_2015 %>% select(Country, Region)
-
 
 comparison_2019 %>% 
   left_join(region, by=c("Country or region" = "Country")) %>%
