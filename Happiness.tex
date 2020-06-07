@@ -1,0 +1,397 @@
+\documentclass[11pt,a4paper,]{article}
+\usepackage{lmodern}
+
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={Exploratory analysing on World Happiness Report},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{geometry}
+\geometry{a4paper, centering, text={16cm,24cm}}
+\usepackage[style=apa,]{biblatex}
+\addbibresource{references.bib}
+\usepackage{longtable,booktabs}
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{long table}}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Exploratory analysing on World Happiness Report}
+
+%% MONASH STUFF
+
+%% CAPTIONS
+\RequirePackage{caption}
+\DeclareCaptionStyle{italic}[justification=centering]
+ {labelfont={bf},textfont={it},labelsep=colon}
+\captionsetup[figure]{style=italic,format=hang,singlelinecheck=true}
+\captionsetup[table]{style=italic,format=hang,singlelinecheck=true}
+
+
+%% FONT
+\RequirePackage{bera}
+\RequirePackage[charter,expert,sfscaled]{mathdesign}
+\RequirePackage{fontawesome}
+
+%% HEADERS AND FOOTERS
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\rfoot{\Large\sffamily\raisebox{-0.1cm}{\textbf{\thepage}}}
+\makeatletter
+\lhead{\textsf{\expandafter{\@title}}}
+\makeatother
+\rhead{}
+\cfoot{}
+\setlength{\headheight}{15pt}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\sffamily\thepage} % except the center
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+%% MATHS
+\RequirePackage{bm,amsmath}
+\allowdisplaybreaks
+
+%% GRAPHICS
+\RequirePackage{graphicx}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.8}
+
+
+%\RequirePackage[section]{placeins}
+
+%% SECTION TITLES
+
+
+%% SECTION TITLES
+\RequirePackage[compact,sf,bf]{titlesec}
+\titleformat*{\section}{\Large\sf\bfseries\color[rgb]{0.7,0,0}}
+\titleformat*{\subsection}{\large\sf\bfseries\color[rgb]{0.7,0,0}}
+\titleformat*{\subsubsection}{\sf\bfseries\color[rgb]{0.7,0,0}}
+\titlespacing{\section}{0pt}{2ex}{.5ex}
+\titlespacing{\subsection}{0pt}{1.5ex}{0ex}
+\titlespacing{\subsubsection}{0pt}{.5ex}{0ex}
+
+
+%% TITLE PAGE
+\def\Date{\number\day}
+\def\Month{\ifcase\month\or
+ January\or February\or March\or April\or May\or June\or
+ July\or August\or September\or October\or November\or December\fi}
+\def\Year{\number\year}
+
+%% LINE AND PAGE BREAKING
+\sloppy
+\clubpenalty = 10000
+\widowpenalty = 10000
+\brokenpenalty = 10000
+\RequirePackage{microtype}
+
+%% PARAGRAPH BREAKS
+\setlength{\parskip}{1.4ex}
+\setlength{\parindent}{0em}
+
+%% HYPERLINKS
+\RequirePackage{xcolor} % Needed for links
+\definecolor{darkblue}{rgb}{0,0,.6}
+\RequirePackage{url}
+
+\makeatletter
+\@ifpackageloaded{hyperref}{}{\RequirePackage{hyperref}}
+\makeatother
+\hypersetup{
+     citecolor=0 0 0,
+     breaklinks=true,
+     bookmarksopen=true,
+     bookmarksnumbered=true,
+     linkcolor=darkblue,
+     urlcolor=blue,
+     citecolor=darkblue,
+     colorlinks=true}
+
+\usepackage[showonlyrefs]{mathtools}
+\usepackage[no-weekday]{eukdate}
+
+%% BIBLIOGRAPHY
+
+\makeatletter
+\@ifpackageloaded{biblatex}{}{\usepackage[style=authoryear-comp, backend=biber, natbib=true]{biblatex}}
+\makeatother
+\ExecuteBibliographyOptions{bibencoding=utf8,minnames=1,maxnames=3, maxbibnames=99,dashed=false,terseinits=true,giveninits=true,uniquename=false,uniquelist=false,doi=false, isbn=false,url=true,sortcites=false}
+
+\DeclareFieldFormat{url}{\texttt{\url{#1}}}
+\DeclareFieldFormat[article]{pages}{#1}
+\DeclareFieldFormat[inproceedings]{pages}{\lowercase{pp.}#1}
+\DeclareFieldFormat[incollection]{pages}{\lowercase{pp.}#1}
+\DeclareFieldFormat[article]{volume}{\mkbibbold{#1}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}}
+\DeclareFieldFormat[article]{title}{\MakeCapital{#1}}
+\DeclareFieldFormat[article]{url}{}
+%\DeclareFieldFormat[book]{url}{}
+%\DeclareFieldFormat[inbook]{url}{}
+%\DeclareFieldFormat[incollection]{url}{}
+%\DeclareFieldFormat[inproceedings]{url}{}
+\DeclareFieldFormat[inproceedings]{title}{#1}
+\DeclareFieldFormat{shorthandwidth}{#1}
+%\DeclareFieldFormat{extrayear}{}
+% No dot before number of articles
+\usepackage{xpatch}
+\xpatchbibmacro{volume+number+eid}{\setunit*{\adddot}}{}{}{}
+% Remove In: for an article.
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryCitekey{\clearfield{month}}
+
+\makeatletter
+\DeclareDelimFormat[cbx@textcite]{nameyeardelim}{\addspace}
+\makeatother
+
+\author{\sf\Large\textbf{ Weihao Li}\\ {\sf\large 28723740\\[0.5cm]} \sf\Large\textbf{ Jinhao Luo}\\ {\sf\large 29012449\\[0.5cm]}}
+
+\date{\sf\Date~\Month~\Year}
+\makeatletter
+\lfoot{\sf Li, Luo: \@date}
+\makeatother
+
+
+%%%% PAGE STYLE FOR FRONT PAGE OF REPORTS
+
+\makeatletter
+\def\organization#1{\gdef\@organization{#1}}
+\def\telephone#1{\gdef\@telephone{#1}}
+\def\email#1{\gdef\@email{#1}}
+\makeatother
+  \organization{ETC5513 Assignment 4}
+
+  \def\name{Department of\newline Econometrics \&\newline Business Statistics}
+
+  \telephone{(03) 9905 2478}
+
+  \email{BusEco-Econometrics@monash.edu}
+
+\def\webaddress{\url{http://buseco.monash.edu/ebs/consulting/}}
+\def\abn{12 377 614 012}
+\def\logo{\includegraphics[width=6cm]{MBSportrait}}
+\def\extraspace{\vspace*{1.6cm}}
+\makeatletter
+\def\contactdetails{\faicon{phone} & \@telephone \\
+                    \faicon{envelope} & \@email}
+\makeatother
+
+%%%% FRONT PAGE OF REPORTS
+
+\def\reporttype{Report for}
+
+\long\def\front#1#2#3{
+\newpage
+\begin{singlespacing}
+\thispagestyle{empty}
+\vspace*{-1.4cm}
+\hspace*{-1.4cm}
+\hbox to 16cm{
+  \hbox to 6.5cm{\vbox to 14cm{\vbox to 25cm{
+    \logo
+    \vfill
+    \parbox{6.3cm}{\raggedright
+      \sf\color[rgb]{0.00,0.00,0.70}
+      {\large\textbf{\name}}\par
+      \vspace{.7cm}
+      \tabcolsep=0.12cm\sf\small
+      \begin{tabular}{@{}ll@{}}\contactdetails
+      \end{tabular}
+      \vspace*{0.3cm}\par
+      ABN: \abn\par
+    }
+  }\vss}\hss}
+  \hspace*{0.2cm}
+  \hbox to 1cm{\vbox to 14cm{\rule{1pt}{26.8cm}\vss}\hss\hfill}
+  \hbox to 10cm{\vbox to 14cm{\vbox to 25cm{
+      \vspace*{3cm}\sf\raggedright
+      \parbox{11cm}{\sf\raggedright\baselineskip=1.2cm
+         \fontsize{24.88}{30}\color[rgb]{0.70,0.00,0.00}\sf\textbf{#1}}
+      \par
+      \vfill
+      \large
+      \vbox{\parskip=0.8cm #2}\par
+      \vspace*{2cm}\par
+      \reporttype\\[0.3cm]
+      \hbox{#3}%\\[2cm]\
+      \vspace*{1cm}
+      {\large\sf\textbf{\Date~\Month~\Year}}
+   }\vss}
+  }}
+\end{singlespacing}
+\newpage
+}
+
+\makeatletter
+\def\titlepage{\front{\expandafter{\@title}}{\@author}{\@organization}}
+\makeatother
+
+\usepackage{setspace}
+\setstretch{1.5}
+
+%% Any special functions or other packages can be loaded here.
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+
+\begin{document}
+\titlepage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+\textcite{helliwell2019world} has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, \textcite{helliwell2019world} has explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilised the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. Meanwhile, the happiness scores have been allocated into the world map to explain the distribution. In addition, the report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
+
+\hypertarget{the-evolution-of-world-happiness}{%
+\section{The evolution of world happiness}\label{the-evolution-of-world-happiness}}
+
+\textcite{helliwell2019world} has indicated that the world has become a rapidly changing place, and such the fastest changing might influence many aspects of different countries on their people. Therefore, in order to explore how satisfied people are with their countries over years, this report has used the happiness score to consider it.
+
+\hypertarget{the-trends-in-happiness-2015-2019}{%
+\subsection{The trends in happiness 2015-2019}\label{the-trends-in-happiness-2015-2019}}
+
+In this part, the top ten countries in 2015 have been extracted to consider how their happiness changing during the five years. According to table \ref{tab:top10-countries-2015}, it has shown that Switzerland
+
+\begin{table}
+
+\caption{\label{tab:top10-countries-2015}Top10 countries in 2015}
+\centering
+\begin{tabular}[t]{l|r}
+\hline
+Country & 2015\\
+\hline
+Switzerland & 7.587\\
+\hline
+Iceland & 7.561\\
+\hline
+Denmark & 7.527\\
+\hline
+Norway & 7.522\\
+\hline
+Canada & 7.427\\
+\hline
+Finland & 7.406\\
+\hline
+Netherlands & 7.378\\
+\hline
+Sweden & 7.364\\
+\hline
+New Zealand & 7.286\\
+\hline
+Australia & 7.284\\
+\hline
+\end{tabular}
+\end{table}
+
+has occupied first place in 2015, which was around 7.59 points. While Iceland was around 0.02 standing in second place. In addition, Australia was the tenth country, which was around 7.28. Based on figure \ref{fig:score-trends}, which has shown that Finland was the country with a significant increase over
+
+\begin{figure}
+\centering
+\includegraphics{Happiness_files/figure-latex/score-trends-1.pdf}
+\caption{\label{fig:score-trends}The trends in happiness scores from 2015-2019 (based on the top10 countries in 2015)}
+\end{figure}
+
+five years. Finland has increased from just over 7.4 to around 7.77 and has become the happiest country in 2019. Meanwhile, Denmark, Norway, Netherlands, and New Zealand have also experienced an increase in both scores and places compared with 2015. Although the happiness score of Sweden has decreased in the same period, however, the rank of Sweden hse improved in 2019. The rest of the four countries have experienced a decrease in both ranks and scores over five years. The reasons for the changing in score and ranks might because of the social welfare, country economic environment, and government policies. Such aspects have all related to each nation a within country so that impacts the satisfaction level.
+
+\hypertarget{the-dynamics-of-the-world-and-regional-happiness-2015-2019}{%
+\subsection{The dynamics of the world and regional happiness 2015-2019}\label{the-dynamics-of-the-world-and-regional-happiness-2015-2019}}
+
+Besides, this report has also considered the changing of regional happiness. Firstly, this report has explored the percentage of the number of countries which happiness scores above or below the world average level in 2015 and 2019 to consider the overall condition. According to figure \ref{fig:combination-plots-2015-2019}, the percentage of the above-average level has accounted for
+
+\begin{figure}
+\centering
+\includegraphics{Happiness_files/figure-latex/combination-plots-2015-2019-1.pdf}
+\caption{\label{fig:combination-plots-2015-2019}The percentage of the number of countries above or below average happiness scores in 2015 and 2019}
+\end{figure}
+
+46.84\% in 2015, which was 74 countries. While there were still 84 countries that did not reach the average level. In 2019, the percentage of the above-average level has increased to 49.36\%, which was 77 countries. And the percentage of the below-average level has decreased to 50.64\%. In general, more and more people have satisfied their countries.
+To study the deeper level, figure \ref{fig:regions-comparison-2015} has explained the number of
+
+\begin{figure}
+\centering
+\includegraphics{Happiness_files/figure-latex/regions-comparison-2015-1.pdf}
+\caption{\label{fig:regions-comparison-2015}The number of above average happiness scores across regions in 2015}
+\end{figure}
+
+countries that above-average level of each region in 2015. According to that figure, Western Europe, and the region of Latin America and the Caribbean have the highest number, which was 19 countries respectively. While the region of Sub-Saharan Africa has only one country that above the average level in 2015. Furthermore, based on figure \ref{fig:regions-comparison-2019}, western Europe has still stood
+
+\begin{figure}
+\centering
+\includegraphics{Happiness_files/figure-latex/regions-comparison-2019-1.pdf}
+\caption{\label{fig:regions-comparison-2019}The number of above average happiness scores across regions in 2019}
+\end{figure}
+
+at the dominant place, which was 19 countries. While Latin America and the Caribbean have lost a country, which totals 18 countries above average level in 2019. Central and Northern Europe have the same number as Latin America and the Caribbean in 2019. Meanwhile, Southern Asia has appeared in the figure in 2019, which was one country above the average level. In addition, North America, the region of Australia and New Zealand, and Sub-Saharan Africa have remained the same level compared with 2015.
+In general, according to the figure of 2015 and 2019, the countries that happiness scores above average level have concentrated on the region of Europe, and Latin America and Caribbean. While the other regions have less number of countries compared with them.
+
+\printbibliography
+
+\end{document}
+
