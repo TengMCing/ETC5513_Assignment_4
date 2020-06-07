@@ -33,7 +33,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=FALSE, messages=FALSE, warning=FALSE)
-knitr::opts_chunk$set(fig.width = 8, fig.height = 5, fig.alig = "center")
+knitr::opts_chunk$set(fig.width = 10, fig.height = 10, fig.alig = "center")
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
 library(tidyverse)
@@ -71,7 +71,7 @@ world_map <-ne_countries(returnclass = "sf")
 &  \text{ Government Corruption } + \text{ Generosity } + \text{Dystopia Residual }
 \end{align*}
   The **table \@ref(tab:model2015)** is shown that there is strong evidence that the happiness score is and only is a simple average of these factors. In addition, all the $$R^2$$is close to 1 from 2015 to 2017 in the **Table \@ref(tab:Rsquared)** ,indicating that these factors are stanardized and no longer to use as building up a model. Besides, for 2018 and 2019 data, the organization provides another set of variables such as social support has been changed from family factor, which are also highly correlated with the happiness score, but we have no method to understand what those values represent since they have been transformed in an unknown manner.
-  Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by different countries.There are another three datasets such as GDP, CPI and population data which are downloaded from The World Bank. And area of each country is computed using the simple feature polygons with the package `rnaturalearth` (@rnaturalearth). We select all the happiness scores between 2015-2019 to construct a new table for happiness score with new factors, therefore **Table \@ref(tab:table-FT)** and **Table \@ref(tab:table-LT)** can be displayed the first three data and the last three data about happiness scores in different years. In addition, we pick up thee variables such as gdp,cpi and population between 2015-2019 to put them into new happiness score dataset. After matching the area of each country and joining them into one dataset,the new dataset with happiness score for analyzing the relative variable improtance is established in the **Table \@ref(tab:tableHS)**.
+  Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by different countries.There are another three datasets such as GDP, CPI and population data which are downloaded from The World Bank. And area of each country is computed using the simple feature polygons with the package `rnaturalearth` (@rnaturalearth). We select all the happiness scores between 2015-2019 to construct a new table for happiness score with new factors, therefore **Table \@ref(tab:table-FT)** and **Table \@ref(tab:table-LT)** can be displayed the first three data and the last three data about happiness scores in different years. In addition, we pick up thee variables such as gdp,cpi and population between 2015-2019 to put them into new happiness score dataset. After matching the area of each country and drop out the missing value, the new dataset with happiness score for analyzing the relative variable improtance is established in the **Table \@ref(tab:tableHS)**.
 ```{r lmmodel}
 model2015 <- lm(as.formula(paste('`', 
                             colnames(data2015)[4], "`~`",
@@ -193,31 +193,39 @@ head(happy_score)%>%kable(caption = 'A clean dataset with Happiness Score')%>%
 ## Variable importance
 
   For comparing the relative importance with each predictors, the **lmg** approach with package `relaipmo` (@relaimpo) is used for evaluating the variable importance in modelling happiness score. By using **lmg** approach to  calculate the relative contribution of each predictor to the $$R^2$$ with the consideration of the sequence of predictors appearing in the model. 
-  Firstly, we built up a **LM** model for the new happiness score dataset. By avoding the different scaling for each variables and checking the percentage marginal effect of each variable, using logarithmic method for setting up a linear regression model. Therefore, a **LM** model is shown :
+  Firstly, we built up a **LM** model for the new happiness score dataset. By eliminating the heteroscedasticity in the residual and interpreting the percentage marginal effect of each variable, using logarithmic method for setting up a linear regression model is an appropriate way. Therefore, a **LM** model is shown :
 \begin{align*}
 \text{log(Happiness Score)} = & \text{ log(CPI)} +  \text{ log(GDP)}+\text{ log(Area)}+ \\
 & \text{ log(Population)} 
 \end{align*}
-  From**Table \@ref(tab:variable-important)**,we can see that the total proportion of variance explained by the model with all four predictors ($$R^2$$) is around 72.88%. For the four predictors, GDP with the higest value in four predictors contributed to 64.37% for the happiness scores,indicating that GDP factor is the most important for hanppiness score and it is related to the change of happiness scores(@gromping2015variable). On the other hand,by using **variance inflation factor** (VIF) measure to evaluate the impact of the correlation among the explanatory variables. In the **Table \@ref(tab:mulitilinearity)**, the VIF value in each predictor is not too high but for the population is almost at 3, indicating that there is a slight correlation of population with other variables in the model(@daoud2017multicollinearity).
+  From**Figure \@ref(fig:variable-important)**,we can see that the total proportion of variance explained by the model with all four predictors ($$R^2$$) is around 72.88%. For the four predictors, GDP with the higest value in four predictors contributed to around 65% for the happiness scores,indicating that GDP factor is the most important for hanppiness score and it is more likely to affect the change of happiness scores when the GDP variable change(@gromping2015variable). On the other hand,by using **variance inflation factor** (VIF) measure to evaluate the impact of the correlation among the explanatory variables. In the **Table \@ref(tab:mulitilinearity)**, the VIF value in each predictor is not too high but for the population variabble is the highest one around at 3, indicating that there is a slight correlation of population with other variables in the model(@daoud2017multicollinearity).
 
-```{r variable-important}
+## Scatter matrix
+  To analyze the relatinship between different perdictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The **Figure \@ref(fig:scattermatrix)**compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating a country’s overall happiness, it is likely that the other factor is important as well. Based on the plots, it seems that the importances of GDP and area are strongly correlated, as well as population and area. Therfore,GDP is the most important factors for evaluating the happiness scores as it has the higest positive correlation with happiness score,but also for the developed countries in most of western area with higest GDP, the happiness scores will be higher than the development countries with lower GDP.
+  In conclusion, GDP is the most influential factors for assessing the happiness scores but the area vriable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon((@clark2011will).
+
+```{r variable-important,fig.cap="Variable importance in happiness score"}
 
 model <- lm(log(`Happiness Score`)~log(area)+log(cpi)+log(gdp)+log(population), data=happy_score)
   
   relImportance<-model%>%relaimpo::calc.relimp(type="lmg",rela=TRUE)
-  tibble('R^2' =relImportance$R2*100 , 'log(gpd)' = relImportance$lmg[3]*100,'log(population)' = relImportance$lmg[4]*100,'log(cpi)' = relImportance$lmg[2]*100,'log(area)' = relImportance$lmg[1]*100)%>%
-  pivot_longer(cols = c('R^2', 'log(gpd)','log(population)','log(cpi)','log(area)'), names_to = "Relative importance",values_to = "Important(%)") %>%
-  kable(caption = 'Variable importance in happiness score') %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+  #tibble('R^2' =relImportance$R2*100 , 'log(gpd)' = relImportance$lmg[3]*100,'log(population)' = relImportance$lmg[4]*100,'log(cpi)' = relImportance$lmg[2]*100,'log(area)' = relImportance$lmg[1]*100)%>%
+  #pivot_longer(cols = c('R^2', 'log(gpd)','log(population)','log(cpi)','log(area)'), names_to = "Relative importance",values_to = "Important(%)") %>%
+  #kable(caption = 'Variable importance in happiness score') %>%
+  #kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+  plot.relimplm(relImportance)
 ```
 
-```{r mulitilinearity}
+```{r mulitilinearity,fig.cap="VIF procedures in each predictors"}
 as.table(car::vif(model))%>%
   kable(caption = 'VIF procedures for checking multilinearity with each predictors') %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
   
 ```
 
-```{r}
-ggpairs(data=happy_score[,-c(2:3)])
+\clearpage
+
+```{r scattermatrix,fig.cap="Happiness Score Scatter Matrix"}
+ggpairs(data=happy_score[,-c(2,3)],
+         main="Happiness Score Scatter Matrix")
 ```
