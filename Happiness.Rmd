@@ -13,6 +13,12 @@ author:
   email: jluo0015@student.monash.edu
   correspondingauthor: true
   qualifications: 29012449
+- familyname: He
+  othernames: Xitong
+  address: Monash University
+  email: xhee0013@student.monash.edu
+  correspondingauthor: true
+  qualifications: 29026342
 department: Department of\newline Econometrics &\newline Business Statistics
 organization: ETC5513 Assignment 4
 bibliography: references.bib
@@ -31,24 +37,33 @@ output:
     toc: false
 ---
 
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache=TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = FALSE, cache=FALSE, messages=FALSE, warning=FALSE)
+knitr::opts_chunk$set(fig.width = 10, fig.height = 10, fig.alig = "center")
 # Make sure you have the latest versions of rmarkdown and bookdown installed
 library(ggplot2)
-library(here)
 library(tidyverse)
-library(readr)
+library(dplyr)
+library(fpp3)
+library(relaimpo)
+library(GGally)
 library(kableExtra)
+library(rnaturalearth)
+library(sf)
+library(rgeos)
+library(lwgeom)
+library(car)
+library(here)
 library(lubridate)
 library(cowplot)
-
 here <- here::here
 ```
 
-
 # Introduction
 
-@helliwell2019world has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, @helliwell2019world has explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilised the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. Meanwhile, the happiness scores have been allocated into the world map to explain the distribution. In addition, the report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
+@helliwell2019world has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, @helliwell2019world has also explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilised the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. Meanwhile, the happiness scores have been allocated into the world map to explain the distribution. In addition, the report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
 
 ```{r read-data}
 happiness_2015 <- read_csv(here("data", "2015.csv"))
@@ -230,7 +245,432 @@ at the dominant place, which was 19 countries. While Latin America and the Carib
 In general, according to the figure of 2015 and 2019, the countries that happiness scores above average level have concentrated on the region of Europe, and Latin America and Caribbean. While the other regions have less number of countries compared with them.
 
 
+# Question 3 : Which variables are useful for modelling happiness scores and how the relationship between happiness scores and other factors?
 
+```{r loaddata}
+data2015 <- read.csv(here::here("Data/2015.csv"))
+data2016 <- read.csv(here::here("Data/2016.csv"))
+data2017 <- read.csv(here::here("Data/2017.csv"))
+data2018 <- read.csv(here::here("Data/2018.csv"))
+data2019 <- read.csv(here::here("Data/2019.csv"))
+GDP<-read_csv("Data/API_NY.GDP.MKTP.CD_DS2_en_csv_v2_1120928.csv",skip=4)
+CPI<-read_csv("Data/API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_1120899.csv", skip = 4)
+Population<- read_csv("Data/API_SP.POP.TOTL_DS2_en_csv_v2_1120881.csv", skip = 4)
+world_map <-ne_countries(returnclass = "sf")
+```
+
+  To explore the factors that could be contributing to the happiness score differences between each year,a **linear regression model** is established by testing the relationship between predictor and response variables.From the **LM** result, we can conclude the estimated closed form of hapiness score:
+
+\begin{align*}
+\text{Hapiness score} = & \text{ GDP per Capita } + \text{ Family } + \text{ Life expectancy }+ \text{ Freedom } +   \\ 
+&  \text{ Government Corruption } + \text{ Generosity } + \text{Dystopia Residual }
+\end{align*}
+  The **table \@ref(tab:model2015)** is shown that there is strong evidence that the happiness score is and only is a simple average of these factors. In addition, all the R squared are close to 1 from 2015 to 2017 in the **Table \@ref(tab:Rsquared)** ,indicating that these factors are stanardized and no longer to use as building up a model. Besides, for 2018 and 2019 data, the organization provides another set of variables such as social support has been changed from family factor, which are also highly correlated with the happiness score, but we have no method to understand what those values represent since they have been transformed in an unknown manner.
+  
+  Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by different countries.There are another three datasets such as GDP, CPI and population data which are downloaded from The World Bank. And area of each country is computed using the simple feature polygons with the package `rnaturalearth` (@rnaturalearth). We select all the happiness scores between 2015-2019 to construct a new table for happiness score with new factors, therefore **Table \@ref(tab:table-FT)** and **Table \@ref(tab:table-LT)** can be displayed the first three data and the last three data about happiness scores in different years. In addition, we pick up thee variables such as gdp,cpi and population between 2015-2019 to put them into new happiness score dataset. After matching the area of each country and drop out the missing value, the new dataset with happiness score for analyzing the relative variable improtance is established in the **Table \@ref(tab:tableHS)**.
+```{r lmmodel}
+model2015 <- lm(as.formula(paste('`', 
+                            colnames(data2015)[4], "`~`",
+                            paste(colnames(data2015)[c(6, 7, 8, 9, 10, 11, 12)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = data2015)
+model2016 <- lm(as.formula(paste('`', 
+                            colnames(data2016)[4], "`~`",
+                            paste(colnames(data2016)[c( 7, 8, 9, 10, 11, 12,13)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = data2016)
+model2017 <- lm(as.formula(paste('`', 
+                            colnames(data2017)[3], "`~`",
+                            paste(colnames(data2017)[c(5,6, 7, 8, 9, 10, 11)], collapse = "`+`"),
+                            '`',
+        sep = ""
+    )), data = data2017)
+```
+
+```{r model2015,fig.cap="Estimated coefficient in the LM model in 2015 dataset"}
+c_table <- summary(model2015)
+rownames(c_table$coefficients) = c_table$coefficients %>%
+  rownames() %>%
+  stringr::str_remove_all('`')
+c_table$coefficients %>%
+  knitr::kable(
+               caption = "Linear regression model for happiness scores in 2015") %>%
+  kableExtra::kable_styling(latex_options = "striped")
+```
+
+
+```{r Rsquared,fig.cap="R squared value from 2015 to 2017"}
+R15<-summary(model2015)$r.squared 
+R16<-summary(model2016)$r.squared 
+R17<-summary(model2017)$r.squared 
+x<-data.frame(R15,R16,R17)
+names(x)[1] <- "2015"
+names(x)[2] <- "2016"
+names(x)[3] <- "2017"
+x%>%kable(caption = ' R Squared in 2015-2017') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+```{r clean-data}
+temp <-data2015 %>%
+  dplyr::select(1,`Happiness Score` = Happiness.Score) %>%
+  mutate(year = 2015)
+data2016 %>%
+  dplyr::select(1,`Happiness Score` = Happiness.Score) %>%
+  mutate(year = 2016) %>%
+  rbind(temp) -> temp
+data2017%>%
+  dplyr::select(1, `Happiness Score` = Happiness.Score) %>%
+  mutate(year = 2017) %>%
+  rbind(temp) -> temp
+data2018 %>%
+  dplyr::select(Country = `Country.or.region`, `Happiness Score` = Score) %>%
+  mutate(year = 2018) %>%
+  rbind(temp) -> temp
+data2019 %>%
+  dplyr::select(Country = `Country.or.region`, `Happiness Score` = Score) %>%
+  mutate(year = 2019) %>%
+  rbind(temp) -> temp
+```
+
+```{r table-FT,fig.cap="Selecting all happiness scores in different years"}
+happy_score<- temp
+#s<-data.frame(head(happy_score,3),tail(happy_score,3))
+
+head(happy_score,3)%>%kable(caption = "The first three data in happyiness scores")%>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+```{r table-LT,fig.cap="Selecting all happiness scores in different years"}
+tail(happy_score,3)%>%kable(caption = "The last three data in happyiness scores") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+
+```{r clean-other-three-dataset}
+
+Population %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'population', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(happy_score) -> happy_score
+GDP %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'gdp', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(happy_score) -> happy_score
+CPI %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'cpi', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(happy_score) -> happy_score
+```
+
+```{r using-rnaturalearth}
+world_map$area = st_area(world_map) %>% as.numeric()
+as_tibble(world_map) %>%
+  dplyr::select(area, name) %>%
+  right_join(happy_score, by = c('name' = 'Country')) -> happy_score
+
+```
+
+```{r tableHS,fig.cap="construct a new dataset for analysing happiness score"}
+happy_score<-happy_score%>% drop_na()
+head(happy_score)%>%kable(caption = 'A clean dataset with Happiness Score')%>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+```
+
+\clearpage
+
+
+## Variable importance
+
+  For comparing the relative importance with each predictors, the **lmg** approach with package `relaipmo` (@relaimpo) is used for evaluating the variable importance in modelling happiness score. By using **lmg** approach to  calculate the relative contribution of each predictor to the R squared with the consideration of the sequence of predictors appearing in the model. 
+  
+  Firstly, we built up a **LM** model for the new happiness score dataset. By eliminating the heteroscedasticity in the residual and interpreting the percentage marginal effect of each variable, using logarithmic method for setting up a linear regression model is an appropriate way. Therefore, a **LM** model is shown :
+\begin{align*}
+\text{log(Happiness Score)} = & \text{ log(CPI)} +  \text{ log(GDP)}+\text{ log(Area)}+ \\
+& \text{ log(Population)} 
+\end{align*}
+
+  From**Figure \@ref(fig:variable-important)**,we can see that the total proportion of variance explained by the model with all four predictors is around 72.88%. For the four predictors, GDP with the higest value in four predictors contributed to around 65% for the happiness scores,indicating that GDP factor is the most important for hanppiness score and it is more likely to affect the change of happiness scores when the GDP variable change(@gromping2015variable). On the other hand,by using **variance inflation factor** (VIF) measure to evaluate the impact of the correlation among the explanatory variables. In the **Table \@ref(tab:mulitilinearity)**, the VIF value in each predictor is not too high but for the population variabble is the highest one around at 3, indicating that there is a slight correlation of population with other variables in the model(@daoud2017multicollinearity).
+
+## Scatter matrix
+  To analyze the relatinship between different perdictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The **Figure \@ref(fig:scattermatrix)** compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating a country’s overall happiness, it is likely that the other factor is important as well. Based on the plots, it seems that the importances of GDP and area are strongly correlated, as well as population and area. Therfore,GDP is the most important factors for evaluating the happiness scores as it has the higest positive correlation with happiness score,but also for the developed countries in most of western area with higest GDP, the happiness scores will be higher than the development countries with lower GDP.
+  
+  In conclusion, GDP is the most influential factors for assessing the happiness scores but the area vriable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon((@clark2011will).
+  
+
+```{r variable-important,fig.cap="Variable importance in happiness score"}
+
+model <- lm(log(`Happiness Score`)~log(area)+log(cpi)+log(gdp)+log(population), data=happy_score)
+  
+  relImportance<-model%>%relaimpo::calc.relimp(type="lmg",rela=TRUE)
+  #tibble('R^2' =relImportance$R2*100 , 'log(gpd)' = relImportance$lmg[3]*100,'log(population)' = relImportance$lmg[4]*100,'log(cpi)' = relImportance$lmg[2]*100,'log(area)' = relImportance$lmg[1]*100)%>%
+  #pivot_longer(cols = c('R^2', 'log(gpd)','log(population)','log(cpi)','log(area)'), names_to = "Relative importance",values_to = "Important(%)") %>%
+  #kable(caption = 'Variable importance in happiness score') %>%
+  #kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+  plot.relimplm(relImportance)
+```
+
+```{r mulitilinearity,fig.cap="VIF procedures in each predictors"}
+as.table(car::vif(model))%>%
+  kable(caption = 'VIF procedures for checking multilinearity with each predictors') %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
+  
+```
+
+\clearpage
+
+```{r scattermatrix,fig.cap="Happiness Score Scatter Matrix"}
+ggpairs(data=happy_score[,-c(2,3)],
+         main="Happiness Score Scatter Matrix")
+```
+
+# Q4. What is the relationship between predictors and happiness score in linear regression analysis?
+
+```{r message=FALSE}
+h15 = read_csv("Data/2015.csv")
+h16 = read_csv("Data/2016.csv")
+h17 = read_csv("Data/2017.csv")
+h18 = read_csv("Data/2018.csv")
+h18$`Perceptions of corruption` = as.numeric(h18$`Perceptions of corruption`)
+h19 = read_csv("Data/2019.csv")
+```
+
+<!--
+
+```{r}
+mod15 = lm(as.formula(paste('`', 
+                            colnames(h15)[4], "`~`",
+                            paste(colnames(h15)[c(6, 7, 8, 9, 10, 11, 12)], collapse = "`+`"),
+                                                        '`',
+        sep = ""
+    )), data = h15)
+```
+
+```{r mod2015}
+c_table = summary(mod15)
+
+rownames(c_table$coefficients) = c_table$coefficients %>%
+  rownames() %>%
+  stringr::str_remove_all('`')
+
+c_table$coefficients %>%
+  knitr::kable('latex', 
+               digits = 4, 
+               booktabs = TRUE,
+               caption = "Linear regression model for happiness scores in 2015. The $R^2$ of this model is 1. In the dataset, these factors are standardized.") %>%
+  kableExtra::kable_styling(latex_options = "striped")
+```
+
+To explore the relationship between hapiness score and factors including economy, family, health, freedom, trust and generosity, a linear regression model for the 2015 data was developed. Results of this model is shown in Table \ref{tab:mod2015}. From the result, we can conclude the estimated closed form of hapiness score:
+
+\begin{align*}
+\text{Hapiness score} = & \text{ GDP per Capita } + \text{ Family } + \text{ Life expectancy }+ \text{ Freedom } +   \\ 
+&  \text{ Government Corruption } + \text{ Generosity } + \text{Dystopia Residual }
+\end{align*}
+
+There is strong evidence that the happiness score is and only is a simple average of these factors. Therefore, the relationship between happiness score and these factors is no longer interesting to us.
+
+This situation also happens in 2016 and 2017 data. Besides, for 2018 and 2019 data, the organization provides another set of variables which are also highly correlated with the happiness score, but we have no method to understand what those values represent since they have been transformed in an unknown manner.
+
+Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by country. GDP, CPI and population data is downloaded from The World Bank. And area of each country is computed using the simple feature polygons provided in package `rnaturalearth`.
+
+-->
+
+```{r message=FALSE, warning=FALSE}
+library(rnaturalearth)
+library(sf)
+world_map = ne_countries(returnclass = 'sf')
+gdp = read_csv("Data/API_NY.GDP.MKTP.CD_DS2_en_csv_v2_1120928.csv", skip = 4)
+cpi = read_csv("Data/API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_1120899.csv", skip = 4)
+population = read_csv("Data/API_SP.POP.TOTL_DS2_en_csv_v2_1120881.csv", skip = 4)
+```
+```{r}
+temp = h15 %>%
+  dplyr::select(Country, `Happiness Score`) %>%
+  mutate(year = 2015)
+
+h16 %>%
+  dplyr::select(Country, `Happiness Score`) %>%
+  mutate(year = 2016) %>%
+  rbind(temp) -> temp
+
+h17 %>%
+  dplyr::select(Country, `Happiness Score` = Happiness.Score) %>%
+  mutate(year = 2017) %>%
+  rbind(temp) -> temp
+
+h18 %>%
+  dplyr::select(Country = `Country or region`, `Happiness Score` = Score) %>%
+  mutate(year = 2018) %>%
+  rbind(temp) -> temp
+
+h19 %>%
+  dplyr::select(Country = `Country or region`, `Happiness Score` = Score) %>%
+  mutate(year = 2019) %>%
+  rbind(temp) -> temp
+```
+
+```{r}
+hs = temp
+```
+
+```{r message=FALSE}
+population %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'population', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(hs) -> hs
+
+gdp %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'gdp', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(hs) -> hs
+
+cpi %>%
+  dplyr::select(Country = `Country Name`, `2015`:`2019`) %>%
+  gather(key = 'year', value = 'cpi', `2015`:`2019`) %>%
+  mutate(year = as.numeric(year)) %>%
+  right_join(hs) -> hs
+```
+
+```{r warning=FALSE, message=FALSE}
+world_map$area = st_area(world_map) %>% as.numeric()
+
+as_tibble(world_map) %>%
+  dplyr::select(area, name) %>%
+  right_join(hs, by = c('name' = 'Country')) -> hs
+
+```
+
+
+```{r }
+nona_hs = na.omit(hs)
+
+nona_hs = nona_hs %>%
+  mutate(log_score = log(`Happiness Score`), log_gdp = log(gdp), log_area = log(area), log_population = log(population)) %>%
+  dplyr::select(log_score:log_population, name, year, cpi)
+
+lm(log_score~cpi+log_gdp+log_population+log_area,data=nona_hs) %>%
+  summary() -> lm_sum
+
+```
+
+```{r lmcoeff}
+
+rownames(lm_sum$coefficients) = lm_sum$coefficients %>%
+  rownames() %>%
+  stringr::str_remove_all('`')
+
+lm_sum$coefficients %>%
+  knitr::kable('latex', 
+               digits = 4, 
+               booktabs = TRUE,
+               caption = "Linear regression model for happiness scores. The $R^2$ of this model is 0.7264.") %>%
+  kableExtra::kable_styling(latex_options = "striped")
+```
+
+We use variables mentioned in Q3 as predictors, the regression result is shown in Table \ref{tab:lmcoeff}. According to the result, we can write down the formula for this model:
+
+\begin{align*}
+\text{log(Happiness Score)} = & \ 0.3208 + 0.0005\text{ CPI} + 0.1285 \text{ log(GDP)} \\
+&- 0.1218 \text{ log(Population)} + 0.0056 \text{ log(Area)}
+\end{align*}
+
+Notice that only the intercept, log of GDP and the log of the population are significant with $\alpha = 5$%. Since we take logarithm on both response variable and regressors except CPI given it is a percentage index, we can interpret them as the elasticity of happiness score of GDP and the elasticity of happiness score of the population. This can be proved by:
+
+\begin{align}
+\frac{\partial \text{log(Happiness Score)}}{\partial \text{log(GDP)}} &= 0.1285\\
+\intertext{From (1) we can say, when other variables remain constant }\nonumber \\
+\Delta \text{ log(Happiness Score)} &= 0.1285 \Delta \text{ log(GDP)}\\
+\intertext{By using the linear approximation of log function, we can know}\nonumber\\
+log(x_0 + \Delta x) - log(x_0) &\approx log(x_0) + log'(x_0)\Delta x - log(x_0)\\
+&=  \frac{\Delta x}{x_0} = \text{percentage change in x}\nonumber\\
+\intertext{Therefore}\nonumber\\
+\frac{\Delta \text{ log(Happiness Score)}}{\Delta \text{ log(GDP)}} &\approx \frac{\Delta \text{ Happiness Score}}{\Delta \text{ GDP} }\frac{\text{GDP}}{\text{Happiness Score}}\\
+&=\frac{\% \Delta \text{ Happiness Score}}{\% \Delta \text{ GDP}} \nonumber\\
+&= 0.1285\nonumber
+\end{align}
+
+Now we can interpret the result from Table \ref{tab:lmcoeff}. Only variables that are statistically significant will be reported. Roughly, a 1% increase in GDP leads to a 0.1285% rise in the happiness score, and a 1% increase in population leads to a 0.1218% fall in the happiness score.
+
+```{r}
+world_map$not_included = is.na(sapply(world_map$name, match, table = hs$name))
+```
+
+```{r namap, fig.cap="The world map of missing countries in our dataset"}
+ggplot()+
+  geom_sf(data = world_map, aes(fill = not_included))+
+  ggtitle("World map of countries that are not included in our dataset") +
+  theme_bw()+
+  theme(legend.position = 'bottom') +
+  labs(fill = "Not included")
+```
+Apparently, the happiness score can be affected by other factors that correlated with regressors and doesn't include in our model, such as the education index and the social welfare system. It means an endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include other variables that we think will be useful for happiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression. Besides, another issue with our model is the sample selection problem. There are only 126 countries with completed cases in our final dataset, which means 69 countries are not considered. Figure \ref{fig:namap} shows the map of missing countries. According to the map, most of the countries being omitted are developing countries. It indicates that our samples are not randomly selected from the population, and we are facing an observability issue. It can be expected that the happiness scores in those countries are lower than the average, which suggests we potentially underestimate our coefficients in OLS. 
+
+The diagnostics of our regression is shown in Figure \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. Figure \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
+
+In conclusion, this model does a solid job in explaining the relationship between happiness score and our regressors if our point of interest is countries outside Africa. 
+
+
+
+
+
+
+```{r dig, fig.cap="Regression diagnostics for checking heteroskedasticity, non-normality and influential points", message=FALSE, fig.height=10}
+library(ggrepel)
+mod = lm(log_score~cpi+log_gdp+log_population+log_area,data=nona_hs)
+
+mod_detail = broom::augment(mod, data = nona_hs)
+p1 = ggplot(mod_detail) +
+  geom_point(aes(.fitted, .resid)) +
+  geom_smooth(aes(.fitted, .resid))
+
+p2 = ggplot(mod_detail) +
+  geom_qq(aes(sample = .resid)) +
+  geom_qq_line(aes(sample = .resid))
+
+p3 = ggplot(mod_detail) +
+  geom_point(aes(.fitted, .cooksd)) +
+  geom_text_repel(data = filter(mod_detail, .cooksd>0.0083), aes(.fitted, .cooksd, label = paste0(name,',',year)), col = 'red') +
+  geom_point(data = filter(mod_detail, .cooksd>0.0083), aes(.fitted, .cooksd), col="blue")
+
+library(gridExtra)
+grid.arrange(arrangeGrob(p1,p2, ncol=2),
+         arrangeGrob(p3, ncol=1, nrow=1), top = "Regression diagnostics\n Top left: Residuals vs Fitted. Top right: Normal QQ plot. Bottom:  Cooks distances vs Fitted.", heights=c(1,2))
+```
+
+
+```{r ip, fig.cap="Diagnostics for influential data points", fig.height=10}
+p1 = ggplot()+
+  geom_sf(data = world_map, aes(fill = name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi'))) +
+  theme_bw()+
+  theme(legend.position = "bottom") +
+  labs(fill = 'With influential points') 
+
+p2 = ggplot(mod_detail) +
+  geom_point(aes(log_gdp,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_gdp,.fitted),col="red")
+
+p3 = ggplot(mod_detail) +
+  geom_point(aes(cpi,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(cpi,.fitted),col="red")
+
+p4 = ggplot(mod_detail) +
+  geom_point(aes(log_population,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_population,.fitted),col="red")
+
+p5 = ggplot(mod_detail) +
+  geom_point(aes(log_area,.fitted)) +
+  geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_area,.fitted),col="red")
+
+grid.arrange(p1, arrangeGrob(p2, p3, p4,p5, ncol=2), top = "Diagnostics for influential data points\n Top: World map of countries with influential data points. \n Bottom: Scatter plots of fitted value against each regressor. Red dots represent the infulential data points.", ncol=1, heights =c(2,1))
+```
 
 
 
