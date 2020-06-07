@@ -62,7 +62,7 @@ select = dplyr::select
 
 # Introduction
 
-@helliwell2019world has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, @helliwell2019world has also explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilised the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. Meanwhile, the happiness scores have been allocated into the world map to explain the distribution. In addition, the report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
+@helliwell2019world has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, @helliwell2019world has also explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilized the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. Meanwhile, the happiness scores have been allocated into the world map to explain the distribution. In addition, the report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
 
 
 \clearpage
@@ -197,7 +197,7 @@ total_data_plot %>%
   geom_point(aes(shape = Country))
 ```
 
-five years. Finland has increased from just over 7.4 to around 7.77 and has become the happiest country in 2019. Meanwhile, Denmark, Norway, Netherlands, and New Zealand have also experienced an increase in both scores and places compared with 2015. Although the happiness score of Sweden has decreased in the same period, however, the rank of Sweden hse improved in 2019. The rest of the four countries have experienced a decrease in both ranks and scores over five years. The reasons for the changing in score and ranks might because of the social welfare, country economic environment, and government policies. Such aspects have all related to each nation a within country so that impacts the satisfaction level.
+five years. Finland has increased from just over 7.4 to around 7.77 and has become the happiest country in 2019. Meanwhile, Denmark, Norway, Netherlands, and New Zealand have also experienced an increase in both scores and places compared with 2015. Although the happiness score of Sweden has decreased in the same period, however, the rank of Sweden has improved in 2019. The rest of the four countries have experienced a decrease in both ranks and scores over five years. The reasons for the changing in score and ranks might because of the social welfare, country economic environment, and government policies. Such aspects have all related to each nation a within country so that impacts the satisfaction level.
  
 ## The dynamics of the world and regional happiness 2015-2019
 
@@ -263,15 +263,15 @@ Population<- read_csv("Data/API_SP.POP.TOTL_DS2_en_csv_v2_1120881.csv", skip = 4
 world_map <-ne_countries(returnclass = "sf")
 ```
 
-  To explore the factors that could be contributing to the happiness score differences between each year,a **linear regression model** is established by testing the relationship between predictor and response variables.From the **LM** result, we can conclude the estimated closed form of hapiness score:
+  To explore the factors that could be contributing to the happiness score differences between each year,a **linear regression model** is established by testing the relationship between predictor and response variables.From the **LM** result, we can conclude the estimated closed form of happiness score:
 
 \begin{align*}
-\text{Hapiness score} = & \text{ GDP per Capita } + \text{ Family } + \text{ Life expectancy }+ \text{ Freedom } +   \\ 
+\text{Happiness score} = & \text{ GDP per Capital } + \text{ Family } + \text{ Life expectancy }+ \text{ Freedom } +   \\ 
 &  \text{ Government Corruption } + \text{ Generosity } + \text{Dystopia Residual }
 \end{align*}
-  The **Table \@ref(tab:model2015)** is shown that there is strong evidence that the happiness score is and only is a simple average of these factors. In addition, all the R squared are close to 1 from 2015 to 2017 in the **Table \@ref(tab:Rsquared)** ,indicating that these factors are stanardized and no longer to use as building up a model. Besides, for 2018 and 2019 data, the organization provides another set of variables such as social support has been changed from family factor, which are also highly correlated with the happiness score, but we have no method to understand what those values represent since they have been transformed in an unknown manner.
+  The **Table \@ref(tab:model2015)** is shown that there is strong evidence that the happiness score is and only is a simple average of these factors. In addition, all the R squared are close to 1 from 2015 to 2017 in the **Table \@ref(tab:Rsquared)** ,indicating that these factors are standardized and no longer to use as building up a model. Besides, for 2018 and 2019 data, the organization provides another set of variables such as social support has been changed from family factor, which are also highly correlated with the happiness score, but we have no method to understand what those values represent since they have been transformed in an unknown manner.
   
-  Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by different countries. There are another three datasets such as GDP, CPI and population data which are downloaded from The World Bank. And area of each country is computed using the simple feature polygons with the package `rnaturalearth` [@rnaturalearth]. In addition, we pick up thee variables such as gdp,cpi and population between 2015-2019 to put them into new happiness score dataset. After matching the area of each country and drop out the missing value, the new dataset with happiness score for analyzing the relative variable improtance is established in the **Table \@ref(tab:tableHS)**.
+  Instead of using the factors in the given dataset, we join other datasets to analysis the happiness score, including GDP, CPI, population and area by different countries. There are another three datasets such as GDP, CPI and population data which are downloaded from The World Bank. And area of each country is computed using the simple feature polygons with the package `rnaturalearth` [@rnaturalearth]. In addition, we pick up thee variables such as GDP,CPI and population between 2015-2019 to put them into new happiness score dataset. After matching the area of each country and drop out the missing value, the new dataset with happiness score for analyzing the relative variable importance is established in the **Table \@ref(tab:tableHS)**.
   
   
 ```{r lmmodel}
@@ -386,17 +386,17 @@ head(happy_score)%>%kable(caption = 'A clean dataset with Happiness Score')%>%
 
   For comparing the relative importance with each predictors, the **lmg** approach with package `relaipmo` [@relaimpo] is used for evaluating the variable importance in modelling happiness score. By using **lmg** approach to  calculate the relative contribution of each predictor to the R squared with the consideration of the sequence of predictors appearing in the model. 
   
-  Firstly, we built up a **LM** model for the new happiness score dataset. By eliminating the heteroscedasticity in the residual and interpreting the percentage marginal effect of each variable, using logarithmic method for setting up a linear regression model is an appropriate way. Therefore, a **LM** model is shown :
+  Firstly, we built up a **LM** model for the new happiness score dataset. By eliminating the heteroskedasticity in the residual and interpreting the percentage marginal effect of each variable, using logarithmic method for setting up a linear regression model is an appropriate way. Therefore, a **LM** model is shown :
 \begin{align*}
 \text{log(Happiness Score)} = & \text{ CPI} +  \text{ log(GDP)}+\text{ log(Area)}+ \text{ log(Population)} 
 \end{align*}
 
-  From **Figure \@ref(fig:variable-important)**,we can see that the total proportion of variance explained by the model with all four predictors is around 72.88%. For the four predictors, GDP with the higest value in four predictors contributed to around 65% for the happiness scores,indicating that GDP factor is the most important for hanppiness score and it is more likely to affect the change of happiness scores when the GDP variable change [@gromping2015variable]. On the other hand,by using **variance inflation factor** (VIF) measure to evaluate the impact of the correlation among the explanatory variables. In the **Table \@ref(tab:mulitilinearity)**, the VIF value in each predictor is not too high but for the population variabble is the highest one around at 3, indicating that there is a slight correlation of population with other variables in the model [@daoud2017multicollinearity].
+  From **Figure \@ref(fig:variable-important)**,we can see that the total proportion of variance explained by the model with all four predictors is around 72.88%. For the four predictors, GDP with the highest value in four predictors contributed to around 65% for the happiness scores,indicating that GDP factor is the most important for happiness score and it is more likely to affect the change of happiness scores when the GDP variable change [@gromping2015variable]. On the other hand,by using **variance inflation factor** (VIF) measure to evaluate the impact of the correlation among the explanatory variables. In the **Table \@ref(tab:mulitilinearity)**, the VIF value in each predictor is not too high but for the population variable is the highest one around at 3, indicating that there is a slight correlation of population with other variables in the model [@daoud2017multicollinearity].
 
 ## Scatter matrix
-  To analyze the relatinship between different perdictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The **Figure \@ref(fig:scattermatrix)** compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating a country’s overall happiness, it is likely that the other factor is important as well. Based on the plots, it seems that the importances of GDP and area are strongly correlated, as well as population and area. Therfore,GDP is the most important factors for evaluating the happiness scores as it has the higest positive correlation with happiness score,but also for the developed countries in most of western area with higest GDP, the happiness scores will be higher than the development countries with lower GDP.
+  To analyze the relationship between different predictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The **Figure \@ref(fig:scattermatrix)** compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating a country’s overall happiness, it is likely that the other factor is important as well. Based on the plots, it seems that the importance of GDP and area are strongly correlated, as well as population and area. Therefore,GDP is the most important factors for evaluating the happiness scores as it has the highest positive correlation with happiness score,but also for the developed countries in most of western area with highest GDP, the happiness scores will be higher than the development countries with lower GDP.
   
-  In conclusion, GDP is the most influential factors for assessing the happiness scores but the area vriable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon [@clark2011will].
+  In conclusion, GDP is the most influential factors for assessing the happiness scores but the area variable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon [@clark2011will].
   
 
 ```{r variable-important,fig.cap="Variable importance in happiness score"}
@@ -414,12 +414,12 @@ model <- lm(log(`Happiness Score`)~log(area)+cpi+log(gdp)+log(population), data=
     geom_bar(aes(name,lmg), stat = "identity") +
     ylab('% of R^2') +
     xlab(paste0('R^2 = ', round(relImportance@R2, digits = 4), ', metrics are normalized to sum 100%')) +
-    ggtitle("Relative importances for log(Happiness Score)\nMethod LMG")
+    ggtitle("Relative importance for log(Happiness Score)\nMethod LMG")
 ```
 
 ```{r mulitilinearity,fig.cap="VIF procedures in each predictors"}
 as.table(car::vif(model))%>%
-  kable(caption = 'VIF procedures for checking multilinearity with each predictors') %>%
+  kable(caption = 'VIF procedures for checking multicollinearity with each predictors') %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE, position = "left")
   
 ```
@@ -583,7 +583,7 @@ ggplot()+
 
 Apparently, the happiness score can be affected by other factors that correlated with regressors and doesn't include in our model, such as the education index and the social welfare system. It means an endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include other variables that we think will be useful for happiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression. Besides, another issue with our model is the sample selection problem. There are only 126 countries with completed cases in our final dataset, which means 69 countries are not considered. **Figure** \ref{fig:missmap} shows the map of missing countries. According to the map, most of the countries being omitted are developing countries. It indicates that our samples are not randomly selected from the population, and we are facing an observability issue. It can be expected that the happiness scores in those countries are lower than the average, which suggests we potentially underestimate our coefficients in OLS. 
 
-The diagnostics of our regression is shown in **Figure** \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation [@newey1986simple] to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold suggeted in the book written by @fox2019regression. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. **Figure** \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
+The diagnostics of our regression is shown in **Figure** \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation [@newey1986simple] to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold suggested in the book written by @fox2019regression. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. **Figure** \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
 
 In conclusion, this model does a solid job in explaining the relationship between happiness score and our regressors. 
 
@@ -639,8 +639,23 @@ p5 = ggplot(mod_detail) +
   geom_point(aes(log_area,.fitted)) +
   geom_point(data = filter(mod_detail, name %in% c('Suriname', 'Angola', 'Botswana', 'Sudan', 'Gabon', 'Sierra Leone', 'Togo', 'Burundi')), aes(log_area,.fitted),col="red")
 
-grid.arrange(p1, arrangeGrob(p2, p3, p4,p5, ncol=2), top = "Diagnostics for influential data points\n Top: World map of countries with influential data points. \n Bottom: Scatter plots of fitted value against each regressor. Red dots represent the infulential data points.", ncol=1, heights =c(2,1))
+grid.arrange(p1, arrangeGrob(p2, p3, p4,p5, ncol=2), top = "Diagnostics for influential data points\n Top: World map of countries with influential data points. \n Bottom: Scatter plots of fitted value against each regressor. Red dots represent the influential data points.", ncol=1, heights =c(2,1))
 ```
 
 \clearpage
 
+# Acknowledgement
+- package ggplot2 [@ggplot2],
+- package tidyverse [@tidyverse],
+- package dplyr [@dplyr],
+- package relaimpo [@relaimpo],
+- package GGally [@GGally],
+- package kableExtra [@kableExtra],
+- package rnaturalearth [@rnaturalearth],
+- package sf [@sf],
+- package rgeos [@rgeos],
+- package lwgeom [@lwgeom],
+- package car [@car],
+- package here [@here],
+- package lubridate [@lubridate],
+- package cowplot [@cowplot]
