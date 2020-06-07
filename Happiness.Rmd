@@ -43,7 +43,6 @@ knitr::opts_chunk$set(echo = FALSE, cache=FALSE, message=FALSE, warning=FALSE)
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
-library(fpp3)
 library(relaimpo)
 library(GGally)
 library(kableExtra)
@@ -56,6 +55,7 @@ library(here)
 library(lubridate)
 library(cowplot)
 here <- here::here
+select = dplyr::select
 ```
 
 \clearpage
@@ -119,7 +119,7 @@ comparison_2015 <- happiness_2015 %>%
 pie_2015 <- comparison_2015 %>% 
   select(above_average, below_average) %>% 
   unique() %>% 
-  pivot_longer(c("above_average", "below_average"), names_to = "average", values_to = "count") %>% 
+  gather("average", "count", above_average, below_average) %>% 
   mutate(percentage = round(count/sum(count) * 100, digits = 2)) %>% 
   mutate(percentage_label = paste(percentage, "%")) %>%    # To make the label as percentage format
   ggplot(aes("", percentage, fill = average)) + 
@@ -145,7 +145,7 @@ comparison_2019 <- happiness_2019 %>%
 pie_2019 <- comparison_2019 %>% 
   select(above_average, below_average) %>% 
   unique() %>% 
-  pivot_longer(c("above_average", "below_average"), names_to = "average", values_to = "count") %>% 
+  gather("average", "count", above_average, below_average) %>% 
   mutate(per = round(count/sum(count) * 100, digits = 2)) %>% 
   mutate(per_label = paste(per, "%")) %>%
   ggplot(aes("", per, fill = average)) + 
@@ -188,7 +188,7 @@ total_data <- list(top10_2015, data_2016, data_2017, data_2018, data_2019) %>%
 ```{r score-trends, fig.cap = "The trends in happiness scores from 2015-2019 (based on the top10 countries in 2015)"}
 # Extract the year, and plot the changing of happiness score based on each year in line chart
 total_data_plot <- total_data %>%
-  pivot_longer(c(`2015-01-01`,`2016-01-01`,`2017-01-01`,`2018-01-01`,`2019-01-01`), names_to = "year", values_to = "score") %>% 
+  gather("year","score", c(`2015-01-01`,`2016-01-01`,`2017-01-01`,`2018-01-01`,`2019-01-01`)) %>% 
   mutate(year = year(year))
 
 total_data_plot %>% 
@@ -583,7 +583,7 @@ ggplot()+
 
 Apparently, the happiness score can be affected by other factors that correlated with regressors and doesn't include in our model, such as the education index and the social welfare system. It means an endogeneity issue occurs in our model, which leads our estimator to be bias and inconsistent. We can either include other variables that we think will be useful for happiness score prediction, or find instrumental variable and fit a Two-Stage least squares regression. Besides, another issue with our model is the sample selection problem. There are only 126 countries with completed cases in our final dataset, which means 69 countries are not considered. **Figure** \ref{fig:missmap} shows the map of missing countries. According to the map, most of the countries being omitted are developing countries. It indicates that our samples are not randomly selected from the population, and we are facing an observability issue. It can be expected that the happiness scores in those countries are lower than the average, which suggests we potentially underestimate our coefficients in OLS. 
 
-The diagnostics of our regression is shown in **Figure** \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. **Figure** \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
+The diagnostics of our regression is shown in **Figure** \ref{fig:dig}. From the Residuals vs Fitted plot, we can see the non-constant variance across the fitted value. The model can be adjusted using Heteroskedasticity and Autocorrelation Consistent (HAC) covariance matrix estimation [@newey1986simple] to let our inference to be credible. The QQ plot suggests the density of residuals is asymmetric, but it is very close to a normal distribution. In the Cooks distances vs Fitted plot, we use 4/(n-k-1) as the threshold suggeted in the book written by @fox2019regression. The most influential points are from Suriname, Angola, Botswana, Sudan, Gabon, Sierra Leone, Togo and Burundi. **Figure** \ref{fig:ip} shows the pattern of these countries. Most of them are in Africa, which contains extreme values in either happiness scores, GDP, CPI or area. It tells us that Africa is different from other places in the world, and we can consider putting a dummy variable in our model to indicate whether the country is in Africa.
 
 In conclusion, this model does a solid job in explaining the relationship between happiness score and our regressors. 
 
