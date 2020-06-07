@@ -38,6 +38,7 @@ library(ggplot2)
 library(here)
 library(janitor)
 library(lubridate)
+library(maps)
 library(plotly)
 library(tidyverse)
 require(wbstats)
@@ -45,36 +46,24 @@ require(wbstats)
 
 ```{r read-in, cache = TRUE, include = FALSE}
 happiness_2015 <- read.csv(here::here("Data/2015.csv")) # To extract region info
-happiness_2018 <- read.csv(here::here("Data/2018.csv"))
 happiness_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
 # Happiness and Attribute Scores across the Globe
 
-## Design and Methodology
+There is no formal definition of happiness, it is associated with an individual's state of mind, and we usually know it when we feel it. The happiness ranking and scores use data from the Gallup World Poll. Essentially, survey participants are asked, "from a score of 0-10, how happy are you"? (@sachs2018world)
+
+In this section, a country's "happiness" is quantified by aggregating the values of 6 key criteria: GDP per capita, social support, healthy life expectancy, freedom, generosity, and absence of corruption. This section of the report critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
+
+
+\clearpage
+
+## Data, Design and Methodology
 
 ```{r data-wrangle}
-happiness_2018 <- happiness_2018 %>% 
-  # Add year
-  mutate(year = year(ymd("2018-12-31")),
-         Perceptions.of.corruption = as.numeric(Perceptions.of.corruption)) %>%
-  rename(Country = Country.or.region)
-  
 happiness_2019 <- happiness_2019 %>%
   mutate(year = year(ymd("2019-12-31"))) %>% 
   rename(Country = Country.or.region)
-
-happiness_all <- bind_rows(happiness_2018,
-                           happiness_2019)
-
-# Find conflicting names and countries in 2019 not in 2018
-# setdiff(happiness_2019$Country, happiness_2018$Country) 
-
-happiness_all$Country <-
-  recode(happiness_all$Country, "North Macedonia" = "Macedonia")
-
-happiness_all <- happiness_all %>%
-  filter(!(Country %in% c("Gambia", "Swaziland", "Comoros")))
 ```
 
 ```{r ctry-region}
@@ -83,21 +72,23 @@ ctry_region <- happiness_2015 %>%
   select(Country, Region)
 
 # Find countries that do not have a region
-setdiff(happiness_all$Country, ctry_region$Country) 
+# setdiff(happiness_2019$Country, ctry_region$Country) 
 
 ctry_region$Country <-
   recode(
     ctry_region$Country,
-    "North Cyprus" = "Northern Cyprus",
     "Trinidad and Tobago" = "Trinidad & Tobago",
-    "Somaliland region" = "Somalia")
+    "North Cyprus" = "Northern Cyprus",
+    "Macedonia" = "North Macedonia",
+    "Somaliland region" = "Somalia",
+    "Sudan" = "South Sudan")
 ```
 
 ```{r add-ctry-region}
 # Insert regions to NA regions
 ctry_region <- ctry_region %>% 
-  add_row(Country = "Belize", Region = "Latin America and Caribbean") %>%
   add_row(Country = "Namibia", Region = "Sub-Saharan Africa") %>%
+  add_row(Country = "Gambia", Region = "Sub-Saharan Africa") %>%
   add_row(Country = "South Sudan", Region = "Sub-Saharan Africa") %>%
   mutate(Region = as.factor(Region)) 
 ```
@@ -105,24 +96,41 @@ ctry_region <- ctry_region %>%
 ```{r join-happiness-region}
 # Include regions in df
 # Clean names
-happiness_all <- full_join(happiness_all, ctry_region, by = "Country") %>%
+happiness_2019 <- full_join(happiness_2019, ctry_region, by = "Country") %>%
   clean_names()
 ```
 
-# Analysis 1: 2019 Happiness Scores on the World Map
+First, the happiness data from 2015 was utilised to retrieve the regions for each  country, these regions are added to the 2018 and 2019 datasets. Countries with omitted regions are then manually inserted. Next, 3 countries with missing attribute scores are removed. 
+
+To construct the happiness score on a map, the world map data is taken from the maps package (@maps) to create a base map and retrieve the geographic coordinates of all countries in the world. Subsequently, the happiness data is further wrangled to resolve conflicting country names between the happiness and the map data; Both datasets are then joined to build the world map with the happiness score of each country.
+
+The attribute scores of the six criteria are evaluated across the various countries and regions. The estimates of population data are employed (@wbstats) to determine if population size affects happiness scores. Similar to the world map, conflicting country names are modified so countries in both datasets match. Consequently, the attribute scores of all countries in the happiness data set are laid out on a scatter plot.
+
+\clearpage 
+
+## Limitations
+
+On top of the survey response bias, it should be noted that some limitations of this analysis include non-sampling errors such as defects in the selection of survey participants and population coverage limitations. Further, with a holistic approach in determining happiness scores of each country, minute details such as  in each city or state within countries cannot be computed. Lastly, the happiness data is aggregated, thus evaluations such as comparisons between different genders or age groups may not be established.
+
+\clearpage
+
+## Analysis 1: 2019 Happiness Scores on the World Map
 
 ```{r world-map-data}
+require(maps)
 map_world <- map_data("world")
 ```
 
 ```{r conflict-names, include = FALSE}
-# Find conflicting names
-setdiff(happiness_all$country, map_world$region)
+# Find conflicting country names
+setdiff(happiness_2019$country, map_world$region)
 ```
 
 ```{r cleaning-ctry-names}
 # Create new df for map
-happiness_map <- happiness_all
+happiness_map <- happiness_2019
+
+# setdiff(happiness_2019$country, map_world$region)
 
 # Solve conflicting names
 happiness_map$country <-
@@ -133,6 +141,7 @@ happiness_map$country <-
     "Trinidad & Tobago" = "Trinidad",
     "Northern Cyprus" = "Cyprus",
     "Hong Kong" = "China",
+    "North Macedonia" = "Macedonia",
     "Palestinian Territories" = "Palestine",
     "Congo (Brazzaville)" = "Republic of Congo",
     "Congo (Kinshasa)" = "Democratic Republic of the Congo")
@@ -141,16 +150,18 @@ happiness_map$country <-
 ```{r happiness-map-combine}
 # Join map and happiness data
 map_combined <- 
-  left_join(map_world, happiness_map, by = c('region' = 'country')) 
+  left_join(map_world, happiness_map, by = c('region' = 'country')) %>%
+  rename(country = "region")
 ```
 
-```{r world-happiness-map}
-ggplot(data = map_combined) +
+```{r world-happiness-map, fig.align = "center", out.height="45%", fig.cap = "Happiness Scores of Countries around the World"}
+p1 <- ggplot(data = map_combined) +
   geom_polygon(aes(
     x = long,
     y = lat,
     group = group,
-    fill = score
+    fill = score,
+    label = country 
   ), colour = "black") +
   coord_equal() +
   scale_fill_distiller(palette = "PRGn", 
@@ -161,19 +172,31 @@ ggplot(data = map_combined) +
   axis.line = element_blank(),
   axis.ticks = element_blank(),
   axis.title = element_blank(),
-  panel.border = element_blank(),
+  panel.border = element_rect(colour = "black", fill=NA, size = 1.5),
   panel.grid = element_blank(),
   panel.background = element_rect(fill = "light blue"),
-  plot.title = element_text(hjust = 0.5, size = 20,face = "bold")) +
-  ggtitle("Happiness Attribute Scores around the World") +
+  plot.title = element_text(hjust = 0.5, size = 16, face = "bold.italic" )) +
+  ggtitle("Happiness Scores around the World") +
   theme(legend.position= "bottom")
+
+p1
+
+# Interactive Map
+# ggplotly(p1, tooltip = c("label", "fill"))
+
 ```
 
-# Analysis 2: Compare attribute scores across countries
+Figure \@ref(fig:world-happiness-map) depicts the happiness scores of each country on a world map. The x-axis and y-axis represent the longitude and latitude respectively. It is observed that happiness scores within continents or regions are analogous. For instance, happiness scores in Africa are relatively low compared to the rest of the world. It can be implied that these African countries may have poor happiness scores because of low economical levels or even associated with high political instability and reoccurring periodic outbreaks of armed conflict (@sachs2018world).
+
+Comparatively, continents such as Europe, North America, and Australia have consistently high happiness scores in most countries. Moreover, the top 10 happiest countries are evidently dominated by Scandinavian countries such as Finland and Denmark. These figures can also be viewed on (**Refer to Roger top 20 tables**).
+
+\clearpage
+
+## Analysis 2: Compare attribute scores across countries
 
 ```{r}
 # Place all attribute scores on one variable for plotting
-happiness_attr2019 <- happiness_all %>%
+happiness_attr2019 <- happiness_2019 %>%
   filter(year == 2019) %>%
   pivot_longer(cols = gdp_per_capita:perceptions_of_corruption, 
                names_to = "attr",
@@ -182,7 +205,7 @@ happiness_attr2019 <- happiness_all %>%
 
 ```{r}
 require(wbstats)
-# Population, total
+# Retrieve population estimates of countries in the world
 pop_ests2018 <- wb(indicator = "SP.POP.TOTL", startdate = 2018, enddate = 2019)
 
 pop_ests2018 <- pop_ests2018 %>%
@@ -203,8 +226,8 @@ happiness_attr2019$country <-
     "Northern Cyprus" = "Cyprus",
     "Russia" = "Russian Federation",
     "Hong Kong" = "Hong Kong SAR, China",
-    "Macedonia" = "North Macedonia", 
     "Kyrgyzstan" = "Kyrgyz Republic",
+    "Macedonia" = "North Macedonia", 
     "Ivory Coast" = "Cote d'Ivoire",
     "Congo (Brazzaville)" = "Congo, Rep.",
     "Laos" = "Lao PDR",
@@ -212,6 +235,8 @@ happiness_attr2019$country <-
     "Palestinian Territories" = "West Bank and Gaza",
     "Iran" = "Iran, Islamic Rep.",
     "Congo (Kinshasa)" = "Congo, Dem. Rep.",
+    "Swaziland" = "Swaziland",
+    "Gambia" = "Gambia",
     "Egypt" = "Egypt, Arab Rep.",
     "Syria" = "Syrian Arab Republic",
     "Yemen" = "Yemen, Rep.")
@@ -230,19 +255,19 @@ attr_scores2019 <- happiness_attr2019 %>%
 
 # Insert average attribute scores in df
 happiness_attr2019 <- full_join(happiness_attr2019, attr_scores2019, by = "attr")
-
-
 ```
 
-```{r happiness_attr2019, fig.width = 6, fig.height = 6, fig.align= "center"}
-ggplot(data = happiness_attr2019,
+```{r happiness-attr2019, fig.width = 6.5, fig.height = 6, fig.align= "center", fig.cap = "Attribute Scores of all Countries"}
+p2 <- ggplot(data = happiness_attr2019,
        aes(x = 1:nrow(happiness_attr2019), # x: number of rows in dataset
            y = attr_score)) +
   geom_point(aes(
     colour = region,
-    alpha = 0.5,
-    size = pop_total
+    alpha = 0.8,
+    size = pop_total,
+    label = country
   )) +
+  scale_colour_brewer(palette = "Paired") +
   # Remove x-axis title, lable and ticks
    theme(axis.title.x=element_blank(),
          axis.text.x=element_blank(),
@@ -260,12 +285,22 @@ ggplot(data = happiness_attr2019,
             alpha = 0.7,
             linetype = "dashed") +
   labs(y = "Attribute Scores") +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        panel.background = element_rect(fill = "light grey")
+        )
+
+p2
+
+# Interactive map
+# ggplotly(p2, tooltip = c("colour","label", "y", "size"))
 ```
 
+The y-axis represents the attribute scores for a given attribute. Each dot symbolises a country's attribute score and the black dashed line represents the average attribute score across all countries for each specific attribute. Of paramount importance, these factors do not have an impact on the happiness score reported for each country but is used to understand the sources of variations in happiness among countries.
 
+Figure \@ref(fig:happiness-attr2019) shows large gaps between the top and bottom countries in each criterion. Like in figure \@ref(fig:world-happiness-map), countries in the Scandinavian region has the highest scores while Africa had low attribute scores in most of the six attributes. 
 
+Next, large variations are illustrated within regions in most of the attributes except for 'healthy life expectancy'. For instance, in 'GDP per capita' and 'freedom', only approximately half of Central and Eastern Europe were above average. In contrary, a consistent pattern can be seen in healthy life expectancy across regions.
 
+The next section of this report will investigate these key criteria to see if happiness scores can be accurately attributed or explained these variables of the different countries (**Double check this statement with Karen/Wei Hao**).
 
-
-
+\clearpage
