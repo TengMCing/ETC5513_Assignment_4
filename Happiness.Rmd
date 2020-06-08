@@ -68,7 +68,12 @@ select = dplyr::select
 
 @helliwell2019world has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, @helliwell2019world has also explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilized the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. The happiness scores will be allocated into a world map to explain the stark differences in happiness scores across the world. Subsequently, six key variables relating to socioeconomical factors are critically analysed to explain the sources of variations in happiness among countries.  
 
-The report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
+The report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the relative importance variables for modelling happiness scores and the correlation between happiness scores and five factors. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. Also, these factors are standardised and have been transformed in unknown way,which will be difficult to construct the model for analysing the relationship between happiness scores and other five factors.
+
+# Data interpretation
+
+We downloaded the data from Kaggle with the license of CCO:Public Domain, which contain the different factors and happiness scores between 2015-2019. In the five datasets, the variable for evaluating the happiness scores about GDP, health, freedom, generosity and government corruption are consistent but the family factor has been changed into social support after 2017. Also, the datasets are ranked from the highest one to the lowest one and the average of the observations are around 156 countries. The happiness scores are based on answered the main life evaluation in the Gallup World Poll. In this report, we are going to use these five datasets to analyse a series of questions for the happiness scores.
+
 
 \clearpage
 
@@ -515,7 +520,7 @@ The next section of this report will investigate these key criteria to see if ha
 
 \clearpage
 
-# Question 3 : Which variables are useful for modelling happiness scores and how the relationship between happiness scores and other factors?
+# Question 3 : Which variables are useful for modelling happiness scores and how the correlation between happiness scores and other factors?
 
 ```{r loaddata}
 data2015 <- read.csv(here::here("Data/2015.csv"))
