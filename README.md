@@ -7,7 +7,8 @@
 - Weihao Li
 
 
-## Q1.
+## Q1. How is the happiness score changing over the five years of the top ten countries in 2015 in the world? How is the number of above average happiness score countries changing between 2015 and 2019?
+- Jinhao Luo
 
 ## Q2.
 

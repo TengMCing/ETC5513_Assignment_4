@@ -199,11 +199,11 @@
 \DeclareDelimFormat[cbx@textcite]{nameyeardelim}{\addspace}
 \makeatother
 
-\author{\sf\Large\textbf{ Weihao Li}\\ {\sf\large 28723740\\[0.5cm]} \sf\Large\textbf{ Jinhao Luo}\\ {\sf\large 29012449\\[0.5cm]} \sf\Large\textbf{ Xitong He}\\ {\sf\large 29026342\\[0.5cm]}}
+\author{\sf\Large\textbf{ Weihao Li}\\ {\sf\large 28723740\\[0.5cm]} \sf\Large\textbf{ Xitong He}\\ {\sf\large 29026342\\[0.5cm]} \sf\Large\textbf{ Jinhao Luo}\\ {\sf\large 29012449\\[0.5cm]} \sf\Large\textbf{ Brendi Ang}\\ {\sf\large 31429254\\[0.5cm]}}
 
 \date{\sf\Date~\Month~\Year}
 \makeatletter
-\lfoot{\sf Li, Luo, He: \@date}
+\lfoot{\sf Li, He, Luo, Ang: \@date}
 \makeatother
 
 
@@ -312,19 +312,28 @@
 
 \textcite{helliwell2019world} has indicated that there is an inner connection between government and happiness, it means the jobs of government would influence the happiness of citizens, while the people feeling of happiness could guide them to decide which kind of government to support. In addition, \textcite{helliwell2019world} has also explained that the living quality of people could be measured by the happiness of each country. Therefore, this report has utilized the happiness score of each country to analyse the changing of well-being according to countries, regions, and the world. The happiness scores will be allocated into a world map to explain the stark differences in happiness scores across the world. Subsequently, six key variables relating to socioeconomical factors are critically analysed to explain the sources of variations in happiness among countries.
 
-The report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. During the study, this report has found the trends and distribution of happiness scores. Meanwhile, this report has explored the ----------what do you find(Karen)------. ------what do you find(weihao's part)------. However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends over the years. ------- other limitations--------.
+The report has also analysed the importance of each modelling variables, as well as the relationships between happiness scores and other factors. In the study, this report has illustrated the trends over five years based on the top ten countries in 2015, and compared the distribution of the number of above average-happiness-level countries of each region in 2015 and 2019. Meanwhile, this report has explored the relative importance variables for modelling happiness scores and the correlation between happiness scores and five factors. Furthermore, the relationship between predictors and happiness score in linear regression analysis, that has been analysed and showed in the last section.
+
+However, the number of countries observed was not consistent across the datasets, which might generate errors when calculating the average level and analyse the trends and distribution over the years. Also, these factors are standardised and have been transformed in unknown way,which will be difficult to construct the model for analysing the relationship between happiness scores and other five factors.
 
 \clearpage
 
-\hypertarget{q1.the-evolution-of-world-happiness}{%
-\section{Q1.The evolution of world happiness}\label{q1.the-evolution-of-world-happiness}}
+\hypertarget{data-interpretation}{%
+\section{Data interpretation}\label{data-interpretation}}
+
+We downloaded the data from Kaggle with the license of CCO:Public Domain, which contain the different factors and happiness scores between 2015-2019. In the five datasets, the variable for evaluating the happiness scores about GDP, health, freedom, generosity and government corruption are consistent but the family factor has been changed into social support after 2017. Also, the datasets are ranked from the highest one to the lowest one and the average of the observations are around 156 countries. The happiness scores are based on answered the main life evaluation in the Gallup World Poll. In this report, we are going to use these five datasets to analyse a series of questions for the happiness scores.
+
+\clearpage
+
+\hypertarget{the-evolution-of-world-happiness}{%
+\section{The evolution of world happiness}\label{the-evolution-of-world-happiness}}
 
 \textcite{helliwell2019world} has indicated that the world has become a rapidly changing place, and such the fastest changing might influence many aspects of different countries on their people. Therefore, in order to explore how satisfied people are with their countries over years, this report has used the happiness score to consider it.
 
 \hypertarget{the-trends-in-happiness-2015-2019}{%
 \subsection{The trends in happiness 2015-2019}\label{the-trends-in-happiness-2015-2019}}
 
-In this part, the top ten countries in 2015 have been extracted to consider how their happiness changing during the five years. According to table \ref{tab:top10-countries-2015}, it has shown that Switzerland
+In this part, the top ten countries in 2015 have been extracted to consider how their happiness changing during the five years. According to table \ref{tab:top10-countries-2015}, it has shown that Switzerland has occupied first place in 2015, which was around 7.59 points. While Iceland was around 0.02 standing in second place. In addition, Australia was the tenth country, which was around 7.28.
 
 \begin{table}
 
@@ -357,7 +366,7 @@ Australia & 7.284\\
 \end{tabular}
 \end{table}
 
-has occupied first place in 2015, which was around 7.59 points. While Iceland was around 0.02 standing in second place. In addition, Australia was the tenth country, which was around 7.28. Based on figure \ref{fig:score-trends}, which has shown that Finland was the country with a significant increase over
+Based on figure \ref{fig:score-trends}, which has shown that Finland was the country with a significant increase over five years. Finland has increased from just over 7.4 to around 7.77 and has become the happiest country in 2019. Meanwhile, Denmark, Norway, Netherlands, and New Zealand have also experienced an increase in both scores and places compared with 2015. Although the happiness score of Sweden has decreased in the same period, however, the rank of Sweden has improved in 2019. The rest of the four countries have experienced a decrease in both ranks and scores over five years. The reasons for the changing in score and ranks might because of the social welfare, country economic environment, and government policies. Such aspects have all related to each nation a within country so that impacts the satisfaction level. The importance of each factor that influence the happiness score would be discussed in the following part.
 
 \begin{figure}
 \centering
@@ -365,12 +374,12 @@ has occupied first place in 2015, which was around 7.59 points. While Iceland wa
 \caption{\label{fig:score-trends}The trends in happiness scores from 2015-2019 (based on the top10 countries in 2015)}
 \end{figure}
 
-five years. Finland has increased from just over 7.4 to around 7.77 and has become the happiest country in 2019. Meanwhile, Denmark, Norway, Netherlands, and New Zealand have also experienced an increase in both scores and places compared with 2015. Although the happiness score of Sweden has decreased in the same period, however, the rank of Sweden has improved in 2019. The rest of the four countries have experienced a decrease in both ranks and scores over five years. The reasons for the changing in score and ranks might because of the social welfare, country economic environment, and government policies. Such aspects have all related to each nation a within country so that impacts the satisfaction level.
-
 \hypertarget{the-dynamics-of-the-world-and-regional-happiness-2015-2019}{%
 \subsection{The dynamics of the world and regional happiness 2015-2019}\label{the-dynamics-of-the-world-and-regional-happiness-2015-2019}}
 
-Besides, this report has also considered the changing of regional happiness. Firstly, this report has explored the percentage of the number of countries which happiness scores above or below the world average level in 2015 and 2019 to consider the overall condition. According to figure \ref{fig:combination-plots-2015-2019}, the percentage of the above-average level has accounted for
+Besides, this report has also considered the changing of regional happiness. Firstly, this report has explored the percentage of the number of countries which happiness scores above or below the world average level in 2015 and 2019 to consider the overall condition.
+
+According to figure \ref{fig:combination-plots-2015-2019}, the percentage of the above-average level has accounted for 46.84\% in 2015, which was 74 countries. While there were still 84 countries that did not reach the average level. In 2019, the percentage of the above-average level has increased to 49.36\%, which was 77 countries. And the percentage of the below-average level has decreased to 50.64\%. In general, more and more people have satisfied their countries.
 
 \begin{figure}
 \centering
@@ -378,8 +387,7 @@ Besides, this report has also considered the changing of regional happiness. Fir
 \caption{\label{fig:combination-plots-2015-2019}The percentage of the number of countries above or below average happiness scores in 2015 and 2019}
 \end{figure}
 
-46.84\% in 2015, which was 74 countries. While there were still 84 countries that did not reach the average level. In 2019, the percentage of the above-average level has increased to 49.36\%, which was 77 countries. And the percentage of the below-average level has decreased to 50.64\%. In general, more and more people have satisfied their countries.
-To study the deeper level, figure \ref{fig:regions-comparison-2015} has explained the number of
+To study the deeper level, figure \ref{fig:regions-comparison-2015} has explained the number of countries that above-average level of each region in 2015. According to that figure, Western Europe, and the region of Latin America and the Caribbean have the highest number, which was 19 countries respectively. While the region of Sub-Saharan Africa has only one country that above the average level in 2015.
 
 \begin{figure}
 \centering
@@ -387,7 +395,7 @@ To study the deeper level, figure \ref{fig:regions-comparison-2015} has explaine
 \caption{\label{fig:regions-comparison-2015}The number of above average happiness scores across regions in 2015}
 \end{figure}
 
-countries that above-average level of each region in 2015. According to that figure, Western Europe, and the region of Latin America and the Caribbean have the highest number, which was 19 countries respectively. While the region of Sub-Saharan Africa has only one country that above the average level in 2015. Furthermore, based on figure \ref{fig:regions-comparison-2019}, western Europe has still stood
+Furthermore, based on figure \ref{fig:regions-comparison-2019}, western Europe has still stood at the dominant place, which was 19 countries. While Latin America and the Caribbean have lost a country, which totals 18 countries above average level in 2019. Central and Northern Europe have the same number as Latin America and the Caribbean in 2019. Meanwhile, Southern Asia has appeared in the figure in 2019, which was one country above the average level. In addition, North America, the region of Australia and New Zealand, and Sub-Saharan Africa have remained the same level compared with 2015.
 
 \begin{figure}
 \centering
@@ -395,8 +403,9 @@ countries that above-average level of each region in 2015. According to that fig
 \caption{\label{fig:regions-comparison-2019}The number of above average happiness scores across regions in 2019}
 \end{figure}
 
-at the dominant place, which was 19 countries. While Latin America and the Caribbean have lost a country, which totals 18 countries above average level in 2019. Central and Northern Europe have the same number as Latin America and the Caribbean in 2019. Meanwhile, Southern Asia has appeared in the figure in 2019, which was one country above the average level. In addition, North America, the region of Australia and New Zealand, and Sub-Saharan Africa have remained the same level compared with 2015.
-In general, according to the figure of 2015 and 2019, the countries that happiness scores above average level have concentrated on the region of Europe, and Latin America and Caribbean. While the other regions have less number of countries compared with them.
+In conclusion, according to the figure of 2015 and 2019, the countries that happiness scores above average level have concentrated on the region of Europe, and Latin America and Caribbean. While the other regions have less number of countries compared with them.
+
+In the next section, the report would discuss the distribution of happiness score and attribute score across the world further.
 
 \clearpage
 
@@ -467,8 +476,8 @@ The next section of this report will investigate these key criteria to see if ha
 
 \clearpage
 
-\hypertarget{question-3-which-variables-are-useful-for-modelling-happiness-scores-and-how-the-relationship-between-happiness-scores-and-other-factors}{%
-\section{Question 3 : Which variables are useful for modelling happiness scores and how the relationship between happiness scores and other factors?}\label{question-3-which-variables-are-useful-for-modelling-happiness-scores-and-how-the-relationship-between-happiness-scores-and-other-factors}}
+\hypertarget{question-3-which-variables-are-useful-for-modelling-happiness-scores-and-how-the-correlation-between-happiness-scores-and-other-factors}{%
+\section{Question 3 : Which variables are useful for modelling happiness scores and how the correlation between happiness scores and other factors?}\label{question-3-which-variables-are-useful-for-modelling-happiness-scores-and-how-the-correlation-between-happiness-scores-and-other-factors}}
 
 To explore the factors that could be contributing to the happiness score differences between each year,a \textbf{linear regression model} is established by testing the relationship between predictor and response variables.From the \textbf{LM} result, we can conclude the estimated closed form of happiness score:
 
@@ -528,17 +537,17 @@ Dystopia.Residual & 1.0000304 & 0.0000417 & 2.400390e+04 & 0.0000000\\
 \hline
 area & name & year & cpi & gdp & population & Happiness Score\\
 \hline
-341242351076 & Finland & 2018 & 1.0838210 & 276743120516 & 5515525 & 7.632\\
+6.522701e+11 & Afghanistan & 2015 & -0.6617092 & 19907111419 & 34413603 & 3.575\\
 \hline
-397994796634 & Norway & 2018 & 2.7648313 & 434166615432 & 5311916 & 7.594\\
+6.522701e+11 & Afghanistan & 2016 & 4.3838920 & 19362642267 & 35383128 & 3.360\\
 \hline
-42759927703 & Denmark & 2018 & 0.8136095 & 355675329086 & 5793636 & 7.555\\
+6.522701e+11 & Afghanistan & 2017 & 4.9759515 & 20191764940 & 36296400 & 3.794\\
 \hline
-107735721363 & Iceland & 2018 & 2.6829177 & 25878475760 & 352721 & 7.495\\
+1.245464e+12 & Angola & 2015 & -21.5316935 & 116193649124 & 27884381 & 4.033\\
 \hline
-46185250673 & Switzerland & 2018 & 0.9363133 & 705140354166 & 8513227 & 7.487\\
+1.245464e+12 & Angola & 2016 & 32.3777341 & 101123851090 & 28842484 & 3.866\\
 \hline
-40024104916 & Netherlands & 2018 & 1.7034979 & 913658465709 & 17231624 & 7.441\\
+1.245464e+12 & Angola & 2017 & 31.6916861 & 122123822334 & 29816748 & 3.795\\
 \hline
 \end{tabular}
 \end{table}
@@ -560,7 +569,7 @@ From \textbf{Figure \ref{fig:variable-important}},we can see that the total prop
 \hypertarget{scatter-matrix}{%
 \subsection{Scatter matrix}\label{scatter-matrix}}
 
-To analyze the relationship between different predictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The \textbf{Figure \ref{fig:scattermatrix}} compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating a country's overall happiness, it is likely that the other factor is important as well. Based on the plots, it seems that the importance of GDP and area are strongly correlated, as well as population and area. Therefore,GDP is the most important factors for evaluating the happiness scores as it has the highest positive correlation with happiness score,but also for the developed countries in most of western area with highest GDP, the happiness scores will be higher than the development countries with lower GDP.
+To analyze the relationship between different predictors, we use scatter matrix which can be visualized easily how much one variable is affected by another or the relationship between them. The \textbf{Figure \ref{fig:scattermatrix}} compares all the predictors in the model and represents the relationship between these variables. If there is a strong positive linear correlation between two factors, we can say that if one factor is important in evaluating the happiness scores, it is likely that the other factor has contribute to it as well. Based on the figures, it seems that the importance of GDP and area are strongly correlated, as well as population and area. Therefore,GDP is the most important factors for evaluating the happiness scores as it has the highest positive correlation with happiness score,but also for the developed countries in most of western area with highest GDP, the happiness scores will be higher than the development countries with lower GDP.
 
 In conclusion, GDP is the most influential factors for assessing the happiness scores but the area variable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon \autocite{clark2011will}.
 
@@ -700,13 +709,13 @@ In conclusion, this model does a solid job in explaining the relationship betwee
 \item
   package lubridate \autocite{lubridate},
 \item
-  package cowplot \autocite{cowplot}
+  package cowplot \autocite{cowplot},
 \item
-  package janitor \autocite{janitor}
+  package janitor \autocite{janitor},
 \item
-  package maps \autocite{maps}
+  package maps \autocite{maps},
 \item
-  package wbstats \autocite{wbstats}
+  package wbstats \autocite{wbstats},
 \item
   package plotly \autocite{plotly}
 \end{itemize}
