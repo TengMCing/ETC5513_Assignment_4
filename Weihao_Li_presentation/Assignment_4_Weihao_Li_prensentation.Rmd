@@ -1,0 +1,114 @@
+---
+title: "Exploratory analysing on World Happiness Report - Modelling"
+author: "Weihao Li"
+email: "wlii0039@student.monash.edu"
+date: "9th June 2020"
+pdflink: ""
+bgimg: "images/8McqxSj.jpg"
+output:
+  xaringan::moon_reader:
+    css:
+      - ninjutsu 
+      - "assets/animate.css"
+      - "assets/monash-logo.css"
+      - "assets/monash-brand.css"
+      - "assets/monash-fonts.css"
+      - "assets/styles.css" # small improvements
+      - "assets/custom.css" # add your own CSS here!
+    self_contained: false 
+    seal: false 
+    chakra: 'libs/remark-latest.min.js'
+    lib_dir: libs
+    includes:
+      in_header: "assets/custom.html"
+    mathjax: "assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    nature:
+      highlightStyle: github 
+      highlightLanguage: r 
+      highlightLines: true
+      highlightSpans: false 
+      countIncrementalSlides: false
+      slideNumberFormat: '%current%/%total%'
+      navigation:
+        scroll: false 
+        touch: true
+        click: false
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+```{r titleslide, child="components/titleslide.Rmd"}
+```
+
+---
+#My work
+
+.grid[
+
+.font_my_2[
+
+##Initialization
+
+
+1. Initialize the remote repostory on Github
+2. Push the EBS report template and datasets to the remote repo
+
+##Help
+
+3. Fix issues
+  - .bib file
+  - cross-refences syntax
+  - plots labels
+4. Format the final report
+
+]
+
+.font_my_2[
+
+##Modelling
+
+3. Find an issue with the happiness data that the explantory variables are useless for modelling
+4. Join other data from the world bank
+5. Build a classical linear model to explain the happiness score
+6. Interpretation
+7. Potential issues disscussion 
+  - Endogeneity
+  - Sample selection
+8. Regression diagnostic
+  - Nomality
+  - Heteroskedasticity
+  - Leverage
+
+
+
+]
+]
+---
+# Tools
+## R Markdown
+- Template: MonashEBSTemplates (https://github.com/robjhyndman/MonashEBSTemplates)
+
+## Version Control
+- Git bash
+  - almost everything
+- Gitraken
+  - Stage file
+  - View tree diagram
+  - Check project progress in Boards
+
+
+---
+
+## Figure source
+
+- On the banks of the Yarra - https://i.imgur.com/8McqxSj.jpg
+
+---
+```{r endslide, child="components/endslide.Rmd"}
+```
+
+
