@@ -194,7 +194,7 @@ Comparatively, continents such as Europe, North America, and Australia have cons
 
 ## Analysis 2: Compare attribute scores across countries
 
-```{r}
+```{r happ-2019-longer}
 # Place all attribute scores on one variable for plotting
 happ_attr2019 <- happ_2019 %>%
   filter(year == 2019) %>%
@@ -203,7 +203,7 @@ happ_attr2019 <- happ_2019 %>%
                values_to = "attr_score") 
 ```
 
-```{r}
+```{r extract-pop-data}
 require(wbstats)
 # Retrieve population estimates of countries in the world
 pop_ests2018 <- wb(indicator = "SP.POP.TOTL", startdate = 2018, enddate = 2019)
@@ -213,7 +213,7 @@ pop_ests2018 <- pop_ests2018 %>%
   rename(pop_total = value)
 ```
 
-```{r}
+```{r wrangling-for-pop-data}
 # Make country names consistent with population data 
 # setdiff(happiness_attr2019$country,pop_ests2018$country)
 happ_attr2019$country <-
@@ -247,7 +247,7 @@ happ_attr2019 <-
   filter(!is.na(overall_rank)) 
 ```
 
-```{r}
+```{r avg-attr-scores}
 # Compute average attribute scores for each attribute
 attr_scores2019 <- happ_attr2019 %>%
   group_by(attr) %>%
