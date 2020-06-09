@@ -1,0 +1,68 @@
+---
+title: "Analysing the variable importance and correlation on Happiness Score "
+author: "XITONG HE(Group 1)"
+date: "June 9 2020"
+pdflink: ""
+bgimg: "images/large.png"
+output:
+  xaringan::moon_reader:
+    css:
+      - ninjutsu 
+      - "assets/animate.css"
+      - "assets/monash-logo.css"
+      - "assets/monash-brand.css"
+      - "assets/monash-fonts.css"
+      - "assets/styles.css" 
+      - "assets/custom.css" 
+    self_contained: false 
+    seal: false 
+    chakra: 'libs/remark-latest.min.js'
+    lib_dir: libs
+    includes:
+      in_header: "assets/custom.html"
+    mathjax: "assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    nature:
+      highlightStyle: github 
+      highlightLanguage: r 
+      highlightLines: true
+      highlightSpans: false 
+      countIncrementalSlides: false
+      slideNumberFormat: '%current%/%total%'
+      navigation:
+        scroll: false 
+        touch: true
+        click: false
+      ratio: '16:9'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+```{r titleslide, child="components/titleslide.Rmd"}
+```
+
+---
+# GitKrahen Board
+
+<img src="images/gitkrahen.png" style="width: 1000px; height: 600px" />
+---
+# Tools
+## R Markdown
+ 1. Template: MonashEBSTemplates
+ 2. Figure setting: fig.width = 8, fig.height = 5, fig.alig = "center"
+ 3. Table style: Kable_styling with "striped","hover"
+ 4. Biblio-style: APA
+   
+## Git
+ 1. GitKrahen Board
+ 2. Git status
+ 3. Git fetch
+ 4. Git merge (conflicts ?)
+ 5. Git amend
+---
+```{r endslide, child="components/endslide.Rmd"}
+```
+
+
