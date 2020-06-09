@@ -682,7 +682,7 @@ head(happy_score)%>%kable(caption = 'A clean dataset with Happiness Score')%>%
   In conclusion, GDP is the most influential factors for assessing the happiness scores but the area variable represents a higher correlation with GDP. Thus, Even in very poor countries, GDP comparisons seem to influence the happiness score mostly; however, it may look more likely to happen in rich-country phenomenon [@clark2011will].
   
 
-```{r variable-important,fig.cap="Variable importance in happiness score"}
+```{r variable-important,fig.cap="Variable importance in happiness score",fig.width = 10, fig.height = 10, fig.alig = "center"}
 
 model <- lm(log(`Happiness Score`)~log(area)+cpi+log(gdp)+log(population), data=happy_score)
   
@@ -707,7 +707,7 @@ as.table(car::vif(model))%>%
   
 ```
 
-```{r scattermatrix,fig.cap="Happiness Score Scatter Matrix", fig.width = 10, fig.height = 10}
+```{r scattermatrix,fig.cap="Happiness Score Scatter Matrix", fig.width = 10, fig.height = 10,fig.alig = "center"}
 ggpairs(data=happy_score[,-c(2,3)],
          main="Happiness Score Scatter Matrix")
 ```
