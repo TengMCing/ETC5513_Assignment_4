@@ -60,9 +60,9 @@ library(tidyverse)
 ##Help
 
 3. Fix issues
-  - .bib file
-  - cross-refences syntax
-  - plots labels
+  - .bib file (Do not put ',' before the last '}')
+  - cross-refences syntax (\@ref() or <code>\ref{}</code>)
+  - plots labels (Use ggplot instead of plot.relimplm() method )
 4. Format the final report
 
 ]
@@ -89,17 +89,21 @@ library(tidyverse)
 ]
 ---
 # Tools
+.font_my[
+
 ## R Markdown
 - Template: MonashEBSTemplates (https://github.com/robjhyndman/MonashEBSTemplates)
+- Control floating objects: flafter (Latex package)
+- APA citation style
 
 ## Version Control
 - Git bash
   - almost everything
-- Gitraken
+- GitKraken
   - Stage file
   - View tree diagram
   - Check project progress in Boards
-
+]
 
 ---
 
