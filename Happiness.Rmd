@@ -1,10 +1,10 @@
 ---
 title: "Exploratory analysing on World Happiness Report"
 author:
-- familyname: Li
-  othernames: Weihao
+- familyname: Ang
+  othernames: Brendi
   address: Monash University
-  email: wlii0039@student.monash.edu
+  email: ang0004@student.monash.edu
   correspondingauthor: true
   qualifications: 28723740
 - familyname: Curie
