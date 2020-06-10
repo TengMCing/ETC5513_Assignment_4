@@ -291,7 +291,7 @@ happ_2019 <- read.csv(here::here("Data/2019.csv"))
 
 There is no formal definition of happiness, it is associated with an individual's state of mind, and we usually know it when we feel it. The happiness ranking and scores use data from the Gallup World Poll; Essentially, survey participants are asked, "from a score of 0-10, how happy are you"? [@sachs2018world]
 
-In this section, six key criteria, which encompassess socioeconomic factors of countries are aggregated and quantified to explain the variation of happiness across countries. These criteria include GDP per capita, social support, healthy life expectancy, freedom, generosity, and absence of corruption. This section critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
+In this section, six key criteria, which encompass socioeconomic factors of countries are quantified to explain the variation of happiness across countries. These criteria include GDP per capita, social support, healthy life expectancy, freedom, generosity, and the absence of corruption. This section critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
 
 ### Incorporate the map data
 
@@ -336,11 +336,11 @@ happ_2019 <- full_join(happ_2019, ctry_region, by = "Country") %>%
   clean_names()
 ```
 
-First, the happiness data from 2015 was utilised to retrieve the regions for each  country, these regions are added to the 2018 and 2019 datasets. Countries with omitted regions are then manually inserted. Next, 3 countries with missing attribute scores are removed. 
+First, the happiness data from 2015 was utilised to retrieve the regions for each country, these regions are added to the 2019 happiness dataset. Subsequently, countries with omitted regions are then manually inserted and 3 countries with missing attribute scores are removed. 
 
-To construct the happiness score on a map, the world map data is taken from the maps package [@maps] to create a base map and retrieve the geographic coordinates of all countries in the world. Subsequently, the happiness data is further wrangled to resolve conflicting country names between the happiness and the map data; Both datasets are then joined to build the world map with the happiness score of each country.
+To construct the happiness score on a map, the world map data is taken from the maps `R` package [@maps] to create a base map and retrieve the geographic coordinates of all countries in the world. Next, the happiness data is further wrangled to resolve conflicting country names between the happiness and the map data; Both datasets are then joined to build the world map with the happiness score of each country.
 
-The attribute scores of the six criteria are evaluated across the various countries and regions. The estimates of population data are employed [@wbstats] to determine if population size affects happiness scores. Similar to the world map, conflicting country names are modified so countries in both datasets match. Consequently, the attribute scores of all countries in the happiness data set are laid out on a scatter plot.
+The attribute scores of the six criteria are evaluated across the various countries and regions. Further, the estimates of the world population data are employed [@wbstats] to determine if population size affects happiness scores. Similar to the world map, conflicting country names are modified so countries in both datasets match. Consequently, the six attribute scores across all countries in the happiness data set are laid out on a scatter plot.
 
 On top of the survey response bias, it should be noted that some limitations of this analysis include non-sampling errors such as defects in the selection of survey participants and population coverage limitations. Further, with a holistic approach in determining happiness scores of each country, minute details such as  in each city or state within countries cannot be computed. Lastly, the happiness data is aggregated, thus evaluations such as comparisons between different genders or age groups may not be established.
 
@@ -417,7 +417,7 @@ happ_map_plot
 
 ```
 
-Figure \@ref(fig:world-happiness-map) depicts the happiness scores of each country on a world map. The x-axis and y-axis represent the longitude and latitude respectively. It is observed that happiness scores within continents or regions are analogous. For instance, happiness scores in Africa are relatively low compared to the rest of the world. It can be implied that these African countries may have poor happiness scores because of low economical levels or even associated with high political instability and reoccurring periodic outbreaks of armed conflict [@sachs2018world].
+Figure \@ref(fig:world-happiness-map) depicts the happiness scores of each country on a world map. The x-axis and y-axis represent the longitude and latitude respectively. It is observed that happiness scores within continents or regions are analogous. For instance, happiness scores in Africa are relatively low compared to the rest of the world. It can be implied that some African countries may have poor happiness scores because of low economical levels or even associated with high political instability and reoccurring periodic outbreaks of armed conflict [@sachs2018world].
 
 Comparatively, continents such as Europe, North America, and Australia have consistently high happiness scores in most countries. Moreover, the top 10 happiest countries are evidently dominated by Scandinavian countries such as Finland and Denmark, which was likewise underlined in the previous section (Figure \@ref(fig:score-trends)).
 
@@ -500,7 +500,7 @@ happ_attr2019_plot <- ggplot(data = happ_attr2019,
          axis.text.x=element_blank(),
          axis.ticks.x=element_blank()) +
   facet_wrap(~ attr, 
-             scales = "free_y", # rescale each attribute score
+             scales = "free", # rescale each attribute score
              ncol = 3,
              nrow = 2,
              strip.position = "bottom"
@@ -517,18 +517,19 @@ happ_attr2019_plot <- ggplot(data = happ_attr2019,
         )
 
 happ_attr2019_plot
-
 # Interactive map
 # ggplotly(happ_attr2019_plot, tooltip = c("colour","label", "y", "size"))
 ```
 
 The y-axis represents the attribute scores for a given attribute. Each dot symbolises a country's attribute score and the black dashed line represents the average attribute score across all countries for each specific attribute. Of paramount importance, these factors do not have an impact on the happiness score reported for each country but is used to understand the sources of variations in happiness among countries.
 
-Figure \@ref(fig:happiness-attr2019) shows large gaps between the top and bottom countries in each criterion. Like in figure \@ref(fig:world-happiness-map), countries in the Scandinavian region has the highest scores while Africa had low attribute scores in most of the six attributes. 
+Figure \@ref(fig:happiness-attr2019) shows a large disparity between the top and bottom countries in each criterion. In conjunction with figure \@ref(fig:world-happiness-map), countries with high happiness scores like countries the Scandinavian region has the highest values for most of the key variables. Therefore, it is suggested that countries who live happier lives are likely to live longer, have more social support, are more cooperative, and generally more abled to meet life’s demands with a higher GDP.
 
-Next, large variations are illustrated within regions in most of the attributes except for 'healthy life expectancy'. For instance, in 'GDP per capita' and 'freedom', only approximately half of Central and Eastern Europe were above average. In contrary, a consistent pattern can be seen in healthy life expectancy across regions.
+On the contrary, Sub-Saharan Africa had low attribute scores in most of the six attributes. It should be noted that some countries in Sub-Saharan had high scores in attributes such as generosity and freedom to make life choices. However, it can be implied that the other key factors may diminish the happiness scores of the country.
 
-The next section of this report will investigate these key criteria to see if happiness scores can be attributed to or explained by these variables of the different countries.
+Healthy life expectancy are noticeably similar in each region. Conversely, large variations are illustrated within regions in most of the other attributes. For instance, in 'GDP per capita' and 'freedom', only approximately half of Central and Eastern Europe were above average, signifying that attribute scores are not homogeneous across all countries in a given region. 
+
+Importantly, the aforementioned variables may be taking credit due to unmeasured factors. The next section of this report will investigate these key criteria to see if happiness scores can be accurately attributed or explained by these variables of the different countries.
 
 \clearpage
 
