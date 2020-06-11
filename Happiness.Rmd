@@ -948,13 +948,3 @@ The programming language used to analyse the happiness data is R [@R]. Following
 - package plotly [@plotly]
 
 \clearpage
-
-Figure \@ref(fig:happiness-attr2019) shows a large disparity between the top and bottom countries in each criterion. In conjunction with figure \@ref(fig:world-happiness-map), countries with high happiness scores like countries the Scandinavian region has the highest values for most of the key variables. Therefore, it is suggested that countries who live happier lives are likely to live longer, have more social support, are more cooperative, and generally more abled to meet life’s demands with a higher GDP.
-
-On the contrary, Sub-Saharan Africa had low attribute scores in most of the six attributes. It should be noted that some countries in Sub-Saharan had high scores in attributes such as generosity and freedom to make life choices. However, it can be implied that the other key factors may diminish the happiness scores of the country.
-
-Healthy life expectancy are noticeably similar in each region. Conversely, large variations are illustrated within regions in most of the other attributes. For instance, in 'GDP per capita' and 'freedom', only approximately half of Central and Eastern Europe were above average, signifying that attribute scores are not homogeneous across all countries in a given region. 
-
-Importantly, the aforementioned variables may be taking credit due to unmeasured factors. The next section of this report will investigate these key criteria to see if happiness scores can be accurately attributed or explained by these variables of the different countries.
-
-\clearpage
