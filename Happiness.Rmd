@@ -87,7 +87,7 @@ However, the number of countries observed was not consistent across the datasets
 
 ## Data description
 
-We downloaded the data from Kaggle with the license of CCO:Public Domain, which contain the different factors and happiness scores between 2015-2019. In the five datasets, the variable for evaluating the happiness scores about GDP, health, freedom, generosity and government corruption are consistent but the family factor has been changed into social support after 2017. Also, the datasets are ranked from the highest one to the lowest one and the average of the observations are around 156 countries. The happiness scores are based on answered the main life evaluation in the Gallup World Poll. In this report, we are going to use these five datasets to analyse a series of questions for the happiness scores. In addition, other datasets from the World Bank will be used because of some issues with the happiness scores report. Details about those datasets will be dissucued in the modelling section.
+We downloaded the data from Kaggle with the license of CCO:Public Domain, which contain the different factors and happiness scores between 2015-2019. In the five datasets, the variable for evaluating the happiness scores about GDP, health, freedom, generosity and government corruption are consistent but the family factor has been changed into social support after 2017. Also, the datasets are ranked from the highest one to the lowest one and the average of the observations are around 156 countries. The happiness scores are based on answered the main life evaluation in the Gallup World Poll. In this report, we are going to use these five datasets to analyse a series of questions for the happiness scores. In addition, other datasets from the World Bank will be used because of some issues with the happiness scores report. Details about those datasets will be discussed in the modelling section.
 
 ## Data pre-processing
 
@@ -292,7 +292,7 @@ happ_2019 <- read.csv(here::here("Data/2019.csv"))
 
 There is no formal definition of happiness, it is associated with an individual's state of mind, and we usually know it when we feel it. The happiness ranking and scores use data from the Gallup World Poll; Essentially, survey participants are asked, "from a score of 0-10, how happy are you"? [@sachs2018world]
 
-In this section, six key criteria, which encompass socioeconomic factors of countries are quantified to explain the variation of happiness across countries. These criteria include GDP per capita, social support, healthy life expectancy, freedom, generosity, and the absence of corruption. This section critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
+In this section, six key criteria, which encompass socioeconomic factors of countries are quantified to explain the variation of happiness across countries. These criteria include GDP per capital, social support, healthy life expectancy, freedom, generosity, and the absence of corruption. This section critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
 
 ### Incorporate the map data
 
@@ -521,11 +521,11 @@ happ_attr2019_plot
 
 The y-axis represents the attribute scores for a given attribute. Each dot symbolises a country's attribute score and the black dashed line represents the average attribute score across all countries for each specific attribute. Of paramount importance, these factors do not have an impact on the happiness score reported for each country but is used to understand the sources of variations in happiness among countries.
 
-Figure \@ref(fig:happiness-attr2019) shows a large disparity between the top and bottom countries in each criterion. In conjunction with figure \@ref(fig:world-happiness-map), countries with high happiness scores like countries the Scandinavian region has the highest values for most of the key variables. Therefore, it is suggested that countries who live happier lives are likely to live longer, have more social support, are more cooperative, and generally more abled to meet life’s demands with a higher GDP.
+Figure \@ref(fig:happiness-attr2019) shows a large disparity between the top and bottom countries in each criterion. In conjunction with figure \@ref(fig:world-happiness-map), countries with high happiness scores like countries the Scandinavian region has the highest values for most of the key variables. Therefore, it is suggested that countries who live happier lives are likely to live longer, have more social support, are more cooperative, and generally more able to meet life’s demands with a higher GDP.
 
 On the contrary, Sub-Saharan Africa had low attribute scores in most of the six attributes. It should be noted that some countries in Sub-Saharan had high scores in attributes such as generosity and freedom to make life choices. However, it can be implied that the other key factors may diminish the happiness scores of the country.
 
-Healthy life expectancy are noticeably similar in each region. Conversely, large variations are illustrated within regions in most of the other attributes. For instance, in 'GDP per capita' and 'freedom', only approximately half of Central and Eastern Europe were above average, signifying that attribute scores are not homogeneous across all countries in a given region. 
+Healthy life expectancy are noticeably similar in each region. Conversely, large variations are illustrated within regions in most of the other attributes. For instance, in 'GDP per capital' and 'freedom', only approximately half of Central and Eastern Europe were above average, signifying that attribute scores are not homogeneous across all countries in a given region. 
 
 Importantly, the aforementioned variables may be taking credit due to unmeasured factors. The next section of this report will investigate these key criteria to see if happiness scores can be accurately attributed or explained by these variables of the different countries.
 
@@ -921,6 +921,18 @@ p5 = ggplot(mod_detail) +
 
 grid.arrange(p1, arrangeGrob(p2, p3, p4,p5, ncol=2), top = "Diagnostics for influential data points\n Top: World map of countries with influential data points. \n Bottom: Scatter plots of fitted value against each regressor. Red dots represent the influential data points.", ncol=1, heights =c(2,1))
 ```
+
+\clearpage
+
+# Conclusions 
+
+According to the overall studies, the report has concluded that Happiness scores within each continents are analogous, where the top 10 happiest countries are evidently dominated by Scandinavian countries. On the contrary, Sub-Saharan happiness scores are relatively low compared to the rest of world, which may be attributed to lower socioeconomic levels [@sachs2018world]. However, Europe is still the continent has the largest number of above-average countries over five years, and Western Europe was also the dominant region in this period. In fact, Europe has owned the highest number of developed countries compared with other continents, which might imply a possibility that the people in developed countries might more satisfy their countries. Therefore, the environment and condition of developed countries might guide leaders of other countries to understand the factors which would improve the sense of happiness of their citizens. which would improve the sense of happiness of their citizens.
+
+On the other hand, the concept of happiness of each people would keep changing over years, the main reason might because the environment of each country has influence the sense of happiness of citizens. The countries with higher happiness scores are associated with healthier longevity, having better social support and better perceptions of government, and are usually more able to meet life’s demands. Albeit this, many countries with lower happiness scores had high scores in 'generosity' and 'freedom', suggesting that other key variables may be diminishing the happiness scores of these countries. However, it should be noted that the aforementioned variables may be taking credit due to unmeasured factors.
+
+In addition, based on analyzing the relative variable importance in modeling the happiness scores with four factors which are GDP, CPI,area and population, which has indicated that GDP is the most significant factors and the area variable is strongly related to the GDP which contributes to happiness score as well. Therefore,  GDP is an essential factor for evaluating the happiness score especially for rich countries which GDP dominates the happiness scores
+
+Furthermore, GDP has a positive marginal effect on happiness score, while the population has a negative marginal effect on happiness score. Although heteroskedasticity, endogeneity and observability issues arise, the happiness score can still be well explained by our simple linear model.
 
 \clearpage
 
