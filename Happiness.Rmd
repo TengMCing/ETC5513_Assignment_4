@@ -44,21 +44,18 @@ library(tidyverse)
 require(wbstats)
 ```
 
+## Happiness and Attribute Scores across the Globe
+
 ```{r read-in, cache = TRUE, include = FALSE}
 happ_2015 <- read.csv(here::here("Data/2015.csv")) # To extract region info
 happ_2019 <- read.csv(here::here("Data/2019.csv"))
 ```
 
-# Happiness and Attribute Scores across the Globe
-
 There is no formal definition of happiness, it is associated with an individual's state of mind, and we usually know it when we feel it. The happiness ranking and scores use data from the Gallup World Poll; Essentially, survey participants are asked, "from a score of 0-10, how happy are you"? [@sachs2018world]
 
 In this section, six key criteria, which encompass socioeconomic factors of countries are quantified to explain the variation of happiness across countries. These criteria include GDP per capita, social support, healthy life expectancy, freedom, generosity, and the absence of corruption. This section critically analyses these six variables to determine if happiness does change, according to the quality of the society people live across the world.
 
-
-\clearpage
-
-## Data, Design and Methodology
+### Incorporate the map data
 
 ```{r happ-2019-wrangle}
 happ_2019 <- happ_2019 %>%
@@ -73,9 +70,8 @@ ctry_region <- happ_2015 %>%
 
 # Find countries that do not have a region
 # setdiff(happ_2019$Country, ctry_region$Country) 
-
 ctry_region$Country <-
-  recode(
+  dplyr::recode(
     ctry_region$Country,
     "Trinidad and Tobago" = "Trinidad & Tobago",
     "North Cyprus" = "Northern Cyprus",
@@ -106,15 +102,10 @@ To construct the happiness score on a map, the world map data is taken from the 
 
 The attribute scores of the six criteria are evaluated across the various countries and regions. Further, the estimates of the world population data are employed [@wbstats] to determine if population size affects happiness scores. Similar to the world map, conflicting country names are modified so countries in both datasets match. Consequently, the six attribute scores across all countries in the happiness data set are laid out on a scatter plot.
 
-\clearpage 
+On top of the survey response bias, it should be noted that some limitations of this analysis include non-sampling errors such as defects in the selection of survey participants and population coverage limitations. Further, with a holistic approach in determining happiness scores of each country, minute details such as  in each city or state within countries cannot be computed. Lastly, the happiness data is aggregated, thus evaluations such as comparisons between different genders or age groups may not be established.
 
-## Limitations
 
-On top of the survey response bias, it should be noted that some limitations of this analysis include non-sampling errors such as defects in the selection of survey participants and population coverage limitations. Further, with a holistic approach in determining happiness scores of each country, minute details such as the socioeconomic levels of each city or state within countries cannot be computed. Lastly, the happiness data, thus evaluations such as comparisons between different genders or age groups may not be established as the data is aggregated.
-
-\clearpage
-
-## Analysis 1: 2019 Happiness Scores on the World Map
+### 2019 Happiness Scores on the World Map
 
 ```{r world-map-data}
 require(maps)
@@ -134,7 +125,7 @@ happ_map <- happ_2019
 
 # Solve conflicting names
 happ_map$country <-
-  recode(
+  dplyr::recode(
     happ_map$country,
     "United Kingdom" = "UK",
     "United States" = "USA",
@@ -161,7 +152,7 @@ happ_map_plot <- ggplot(data = map_combined) +
     y = lat,
     group = group,
     fill = score,
-    label = country
+    label = country 
   ), colour = "black") +
   coord_equal() +
   scale_fill_distiller(palette = "PRGn", 
@@ -179,29 +170,24 @@ happ_map_plot <- ggplot(data = map_combined) +
   ggtitle("Happiness Scores around the World") +
   theme(legend.position= "bottom")
 
-# happ_map_plot
+happ_map_plot
 
 # Interactive Map
-ggplotly(happ_map_plot, tooltip = c("label", "fill"))
+# ggplotly(happ_map_plot, tooltip = c("label", "fill"))
 
 ```
 
 Figure \@ref(fig:world-happiness-map) depicts the happiness scores of each country on a world map. The x-axis and y-axis represent the longitude and latitude respectively. It is observed that happiness scores within continents or regions are analogous. For instance, happiness scores in Africa are relatively low compared to the rest of the world. It can be implied that some African countries may have poor happiness scores because of low economical levels or even associated with high political instability and reoccurring periodic outbreaks of armed conflict [@sachs2018world].
 
-Comparatively, continents such as Europe, North America, and Australia have consistently high happiness scores in most countries. Moreover, the top 10 happiest countries are evidently dominated by Scandinavian countries such as Finland and Denmark. 
+Comparatively, continents such as Europe, North America, and Australia have consistently high happiness scores in most countries. Moreover, the top 10 happiest countries are evidently dominated by Scandinavian countries such as Finland and Denmark, which was likewise underlined in the previous section (Figure \@ref(fig:score-trends)).
 
-
-\clearpage
-
-## Analysis 2: Compare attribute scores across countries
+### Comparison between attribute scores across countries
 
 ```{r happ-2019-longer}
 # Place all attribute scores on one variable for plotting
 happ_attr2019 <- happ_2019 %>%
   filter(year == 2019) %>%
-  pivot_longer(cols = gdp_per_capita:perceptions_of_corruption, 
-               names_to = "attr",
-               values_to = "attr_score") 
+  gather("attr","attr_score",gdp_per_capita:perceptions_of_corruption) 
 ```
 
 ```{r extract-pop-data}
@@ -218,7 +204,7 @@ pop_ests2018 <- pop_ests2018 %>%
 # Make country names consistent with population data 
 # setdiff(happiness_attr2019$country,pop_ests2018$country)
 happ_attr2019$country <-
-  recode(
+  dplyr::recode(
     happ_attr2019$country,
     "Taiwan" = "China",
     "Slovakia" = "Slovak Republic",
@@ -274,7 +260,7 @@ happ_attr2019_plot <- ggplot(data = happ_attr2019,
          axis.text.x=element_blank(),
          axis.ticks.x=element_blank()) +
   facet_wrap(~ attr, 
-             scales = "free_y", # rescale each attribute score
+             scales = "free", # rescale each attribute score
              ncol = 3,
              nrow = 2,
              strip.position = "bottom"
@@ -290,10 +276,9 @@ happ_attr2019_plot <- ggplot(data = happ_attr2019,
         panel.background = element_rect(fill = "light grey")
         )
 
-# happ_attr2019_plot
-
+happ_attr2019_plot
 # Interactive map
-ggplotly(happ_attr2019_plot, tooltip = c("colour","label", "y", "size"))
+# ggplotly(happ_attr2019_plot, tooltip = c("colour","label", "y", "size"))
 ```
 
 The y-axis represents the attribute scores for a given attribute. Each dot symbolises a country's attribute score and the black dashed line represents the average attribute score across all countries for each specific attribute. Of paramount importance, these factors do not have an impact on the happiness score reported for each country but is used to understand the sources of variations in happiness among countries.
