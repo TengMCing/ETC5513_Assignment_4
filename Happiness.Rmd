@@ -1,10 +1,10 @@
 ---
 title: "Exploratory analysing on World Happiness Report"
 author:
-- familyname: Ang
-  othernames: Brendi
+- familyname: Li
+  othernames: Weihao
   address: Monash University
-  email: ang0004@student.monash.edu
+  email: wlii0039@student.monash.edu
   correspondingauthor: true
   qualifications: 28723740
 - familyname: He
@@ -42,6 +42,7 @@ output:
     citation_package: biblatex
     toc: true
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=FALSE, message=FALSE, warning=FALSE)
