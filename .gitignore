@@ -1,4 +1,5 @@
 Happiness_cache/
 Happiness_files/
 .Rproj.user
-*.Rproj 
+*.Rproj
+.Rhistory
