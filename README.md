@@ -1,6 +1,6 @@
 # ETC5513 Assignment 4 - Exploratory analysing on World Happiness Report
 
-This project apply an analysis on the world happiness report with R. 
+This project use R to analyze the World Happiness Report. 
 
 ## Group members
 - Jinhao Luo
