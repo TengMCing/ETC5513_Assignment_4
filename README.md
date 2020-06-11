@@ -1,18 +1,30 @@
 # ETC5513 Assignment 4 - Exploratory analysing on World Happiness Report
 
+This project apply an analysis on the world happiness report with R. 
+
 ## Group members
 - Jinhao Luo
 - Brendi Lien Jun Ang
 - Xitong He
 - Weihao Li
 
+## Content
 
-## Q1. How is the happiness score changing over the five years of the top ten countries in 2015 in the world? How is the number of above average happiness score countries changing between 2015 and 2019?
-- Jinhao Luo
+```
+1 Introduction and research design
 
-## Q2.
-
-## Q3.
-
-## Q4. What is the relationship between predictors and happiness score in linear regression analysis?
-- Weihao Li
+2 Data 
+  2.1 Data description 
+  2.2 Data pre-processing 
+  
+3 Exploratory data analysis 
+  3.1 The evolution of world happiness
+  3.2 Happiness and Attribute Scores across the Globe 
+  
+4 Modelling
+  4.1 Which variables are useful for modelling happiness scores and how the correlation between happiness scores and other factors? 
+  4.2 What is the relationship between predictors and happiness score in linear regression analysis? 
+  
+5 Conclusions 
+6 Acknowledgement 
+```
